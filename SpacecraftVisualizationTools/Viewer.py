@@ -11,9 +11,9 @@ from threading import Thread
 import time
 import numpy as np
 import pyvista as pv
-from geometry_definition import GeoDef
+from ElementsDefinition import GeoDef
 import pandas as pd
-from visualization2D import MainGraph
+from Graphics import MainGraph
 from datalogcsv import DataHandler
 from pyquaternion import Quaternion
 
@@ -179,7 +179,7 @@ class Viewer(GeoDef, Qt.QMainWindow):
             # Update time
             self.updateTime()
             i += 1
-        self.thread = None
+
 
     def run_orbit_3d(self):
         if self.thread == None:

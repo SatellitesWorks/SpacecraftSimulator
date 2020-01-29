@@ -12,9 +12,8 @@ class SimTime(object):
                  time_properties):
 
         start_string        = time_properties['StartTime']
-        print(start_string)
-        datetime_array      = datetime.strptime(start_string,
-                                                '%Y/%m/%d %H:%M:%S')
+        print('Simulation start Time:' + start_string)
+        datetime_array      = datetime.strptime(start_string, '%Y/%m/%d %H:%M:%S')
         self.start          = datetime_array.timestamp()
         self.start_array    = self.get_array_time()
         self.end            = time_properties['EndTime']

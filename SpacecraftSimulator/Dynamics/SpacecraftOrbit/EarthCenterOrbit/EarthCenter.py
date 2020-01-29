@@ -14,7 +14,8 @@ Created on Thu Jan 16 05:54:44 2020
 
 from Library.sgp4.earth_gravity import wgs72, wgs72old, wgs84
 from Library.sgp4.io import twoline2rv
-from Library.math_sup.tools_reference_frame import jday, gstime, fmod2
+from Library.math_sup.tools_reference_frame import fmod2, _gstime
+
 import numpy as np
 
 twopi       = 2.0 * np.pi
@@ -48,23 +49,20 @@ class earthcenterorbit(object):
         self.current_side = 0
         self.tolerance = 1e-10 # rad
 
-    def propagate(self, string_time):
-        self.position_i, self.velocity_i = self.satellite.propagate(string_time[0], # YYYY
-                                                      string_time[1], # MM
-                                                      string_time[2], # DD
-                                                      string_time[3], # HH
-                                                      string_time[4], # MM
-                                                      string_time[5]) # SS
-        return self.position_i, self.velocity_i
+    def propagate_in_earth(self, string_time):
+        position_i, velocity_i, self.current_jd = self.satellite.propagate(string_time[0], # YYYY
+                                                                           string_time[1], # MM
+                                                                           string_time[2], # DD
+                                                                           string_time[3], # HH
+                                                                           string_time[4], # MM
+                                                                           string_time[5]) # SS
+        self.position_i = np.array(position_i)*1000
+        self.velocity_i = np.array(velocity_i)*1000
+        return self.position_i, self.velocity_i # [m]
 
-    def TransECItoGeo(self, string_time):
-        jdutc = jday(string_time[0],
-                    string_time[1],
-                    string_time[2],
-                    string_time[3],
-                    string_time[4],
-                    string_time[5])
-        self.current_side = gstime(jdutc) # rad
+    def TransECItoGeo(self):
+        print(self.current_jd)
+        self.current_side = _gstime(self.current_jd) # rad
         r = np.sqrt(self.position_i[0]**2 + self.position_i[1]**2)
 
         long = fmod2(np.arctan2(self.position_i[1], self.position_i[0]) - self.current_side)
@@ -78,8 +76,7 @@ class earthcenterorbit(object):
             if (np.abs(lat - phi)) <= self.tolerance:
                 flag_iteration = False
 
+        alt = r/np.cos(lat) - self.radiusearthkm * c * 1000  # *metros
         if lat > np.pi/2:
             lat -= twopi
-
-        alt = r / np.cos(lat) - self.radiusearthkm * c * 1000 # *kilometers
-        return lat*rad2deg, long*rad2deg, alt
+        return lat, long, alt

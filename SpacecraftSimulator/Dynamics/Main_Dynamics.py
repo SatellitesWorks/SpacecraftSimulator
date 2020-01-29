@@ -30,8 +30,8 @@ class main_dynamics(object):
 
     def update_orbit(self):
         array_time,_ = self.simulation_time.get_array_time()
-        current_position, current_velocity = self.orbit_propagate.propagate(array_time)
+        current_position, current_velocity = self.orbit_propagate.propagate_in_earth(array_time)
         return current_position, current_velocity
 
     def update_attitude(self):
-        return [0,0,0, 0], [0,0,0]
+        return [0,0,0, 1], [0,0,0]

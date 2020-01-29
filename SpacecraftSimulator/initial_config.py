@@ -32,8 +32,7 @@ def TimeSim():
     return timesim
 
 def tleSim(tle_name):
-    print(tle_name)
-    tle = tlefile.read('ISS (ZARYA)', 'tle/'+tle_name+'.txt')
+    tle = tlefile.read(tle_name, 'tle/'+tle_name+'.txt')
     return tle
 
 def SatSim():

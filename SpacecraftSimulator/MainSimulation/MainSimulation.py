@@ -36,14 +36,13 @@ class MainSimulation(main_dynamics):
             quat, omega = self.update_attitude()
 
             array_time, str_time = self.simulation_time.get_array_time()
-            lat, long, alt = self.orbit_propagate.TransECItoGeo(array_time)
+            lat, long, alt = self.orbit_propagate.TransECItoGeo()
 
             if self.simulation_time.log_flag:
                 self.main_spacecraft.update_spacecraft_dynamics(pos, vel, quat, omega, lat, long, alt)
 
-                self.main_spacecraft.update_spacecraft_state(str_time,
-                                                             self.simulation_time.countTime)
-                self.earth.gst_Update(rad2deg*self.orbit_propagate.current_side)
+                self.main_spacecraft.update_spacecraft_state(str_time, self.simulation_time.countTime)
+                self.earth.gst_Update(self.orbit_propagate.current_side)
                 self.simulation_time.log_flag = False
 
             # update time

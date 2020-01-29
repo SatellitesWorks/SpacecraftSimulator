@@ -40,6 +40,19 @@ def jday(year, mon, day, hr, minute, sec):
   utc = ((sec / 60.0 + minute) / 60.0 + hr) #  utc in hours#
   return [jd0, utc]
 
+
+def _gstime(jdut1):
+    tut1 = (jdut1 - 2451545.0) / 36525.0
+    temp = -6.2e-6 * tut1 * tut1 * tut1 + 0.093104 * tut1 * tut1 + \
+           (876600.0 * 3600 + 8640184.812866) * tut1 + 67310.54841  # sec
+    temp = (temp * deg2rad / 240.0) % twopi  # 360/86400 = 1/240, to deg, to rad
+
+    #  ------------------------ check quadrants ---------------------
+    if temp < 0.0:
+        temp += twopi
+
+    return temp
+
 def getOE(r, v):
     h = np.cross(r, v)
     rNorm = np.linalg.norm(r)
