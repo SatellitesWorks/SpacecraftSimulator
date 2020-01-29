@@ -13,9 +13,6 @@ from Visualization.Viewer import Viewer
 mainSim = MainSimulation()
 dataLog = mainSim.run_simulation() # Datalog => *.Json
 
-# Create a CSV file
-mainSim.generate_report_csv()
-
 # 3D and 2D visualization
 app = Qt.QApplication(sys.argv)
 window = Viewer(dataLog)

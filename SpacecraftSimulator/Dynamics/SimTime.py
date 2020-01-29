@@ -23,7 +23,9 @@ class SimTime(object):
         self.logperiod      = time_properties['LogPeriod']
         self.simspeed       = time_properties['SimulationSpeed']
         self.propagatestep  = time_properties['PropStepSec']
-        self.countTime = 0
+        self.countTime      = 0
+        self.log_count      = 0
+        self.log_flag       = True
 
     def get_array_time(self):
         datetime_array = datetime.fromtimestamp(self.start)
@@ -33,16 +35,22 @@ class SimTime(object):
                        datetime_array.hour,
                        datetime_array.minute,
                        datetime_array.second + datetime_array.microsecond/1e6]
-        #print(datetime_array.minute, datetime_array.second)
-        return start_array
+        return start_array, datetime_array.strftime('%Y-%m-%d %H-%M-%S')
 
-    def update_time(self):
+    def updateSimtime(self):
         self.start += self.step
         self.countTime += self.step
         self.start_array = self.get_array_time()
+        self.update_log_count()
 
     def progression(self):
         return print(round(100*self.countTime/self.end, 2), '%')
 
     def reset(self):
         self.countTime = 0
+
+    def update_log_count(self):
+        self.log_count += 1
+        if self.log_count == self.logperiod:
+            self.log_flag = True
+            self.log_count = 0

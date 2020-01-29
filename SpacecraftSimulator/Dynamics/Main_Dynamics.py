@@ -7,12 +7,13 @@ Created on Fri Jan 17 03:00:38 2020
 
 from .SpacecraftOrbit.EarthCenterOrbit.EarthCenter import earthcenterorbit
 
+
 class main_dynamics(object):
     def __init__(self, propagation_properties, orbit_properties, simtime_class):
 
         self.orbit_properties       = orbit_properties
         self.propagation_properties = propagation_properties
-        self.simtime                = simtime_class
+        self.simulation_time        = simtime_class
 
     def set_propagator(self):
         if self.propagation_properties[0]['propagate_mode'] == 0:
@@ -28,8 +29,9 @@ class main_dynamics(object):
             print('3')
 
     def update_orbit(self):
-        current_position, current_velocity = self.orbit_propagate.propagate(self.simtime.get_array_time())
+        array_time,_ = self.simulation_time.get_array_time()
+        current_position, current_velocity = self.orbit_propagate.propagate(array_time)
         return current_position, current_velocity
 
     def update_attitude(self):
-        return 0, 0
+        return [0,0,0, 0], [0,0,0]

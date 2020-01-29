@@ -21,10 +21,9 @@ def fmod2(x):
         x = x
     return x
 
-def gstime(jdut1):
-
-    jd0  = jdut1[0]
-    utc  = jdut1[1]
+def gstime(jd):
+    jd0 = jd[0]
+    utc = jd[1]
     tut1 = (jd0 - 2451545.0) / 36525.0
     GST0_time = -6.2e-6* tut1**3 + 0.093104 * tut1**2 + 8640184.812866*tut1 + 24110.54841  #  sec
 
