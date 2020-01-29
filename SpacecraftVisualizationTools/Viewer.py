@@ -6,13 +6,12 @@ Created on Thu Jan 16 02:47:18 2020
 """
 import sys
 from PyQt5 import Qt
+from PyQt5.QtWidgets import QFileDialog
 from threading import Thread
 import time
 import numpy as np
 import pyvista as pv
 from geometry_definition import GeoDef
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
 import pandas as pd
 from visualization2D import MainGraph
 from datalogcsv import DataHandler
@@ -123,12 +122,17 @@ class Viewer(GeoDef, Qt.QMainWindow):
             sim_data = df
             return sim_data
 
-        Tk().withdraw()
-        filename = askopenfilename()
-        dataLog = read_data(filename)
-        self.datalog = DataHandler(dataLog)
-        self.datalog.create_variable()
-        print('Data lag created')
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        filename, _ = QFileDialog.getOpenFileName(self, "Select CSV data file", "", "CSV Files (*.csv)",
+                                                  options=options)
+        if filename:
+            dataLog = read_data(filename)
+            self.datalog = DataHandler(dataLog)
+            self.datalog.create_variable()
+            print('Data log created')
+        else:
+            print('Could not create data log')
 
     def run_simulation(self):
         self.run_flag = True

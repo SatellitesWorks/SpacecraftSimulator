@@ -5,13 +5,15 @@ from pyquaternion import Quaternion
 
 
 class GeoDef(object):
+    datalog = None
+
     def __init__(self, vtk_widget):
         self.vtk_widget = vtk_widget
 
     #def add_sphere(self):
         # add a sphere to the pyqt frame
         self.vtk_widget.subplot(0, 0)
-        sphere      = examples.load_globe()
+        sphere = examples.load_globe()
         sphere.points /= 1000
         self.sphere = sphere
         self.vtk_widget.add_mesh(self.sphere)
@@ -20,9 +22,12 @@ class GeoDef(object):
         #self.vtk_widget.reset_camera()
 
     def add_orbit(self):
-        self.vtk_widget.subplot(0, 0)
-        self.vtk_widget.add_text('Satellite position', font_size=10)
-        self.vtk_widget.add_points(self.datalog.sat_pos_i, point_size=0.8)
+        if self.datalog:
+            self.vtk_widget.subplot(0, 0)
+            self.vtk_widget.add_text('Satellite position', font_size=10)
+            self.vtk_widget.add_points(self.datalog.sat_pos_i, point_size=0.8)
+        else:
+            print('Can not add orbit withouth data log')
 
     def add_spacecraft_2_orbit(self):
         self.vtk_widget.subplot(0, 0)
