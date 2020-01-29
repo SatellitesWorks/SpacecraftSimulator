@@ -10,30 +10,26 @@ from threading import Thread
 import time
 import numpy as np
 import pyvista as pv
-from .geometry_definition import GeoDef
+from .ElementsDefinition import GeoDef
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 import pandas as pd
-from .visualization2D import MainGraph
+from .Graphics import MainGraph
+from .datalogcsv import DataHandler
+from pyquaternion import Quaternion
 
-class Main3D(GeoDef, Qt.QMainWindow):
 
-    def __init__(self, dataLog = None, parent=None, show=True):
-        self.dataLog = dataLog
-        try:
-            self.simtime        = dataLog[0]
-            self.sat_dynamics   = dataLog[1]
-            self.earth_gst      = dataLog[2]
-            self.current_pos = self.sat_dynamics['Orbital']['Position'][0, :]
-        except:
-            print('No datalog, please load some file')
+class Viewer(GeoDef, Qt.QMainWindow):
 
+    def __init__(self, parent=None, show=True):
         self.time_speed     = 1
         self.earth_av       = 7.2921150*360.0*1e-5/(2*np.pi)
         self.run_flag       = False
         self.pause_flag     = False
         self.stop_flag      = False
         self.thread         = None
+        self.countTime      = 0
+
         Qt.QMainWindow.__init__(self, parent)
         # create the frame
         self.frame = Qt.QFrame()
@@ -50,7 +46,6 @@ class Main3D(GeoDef, Qt.QMainWindow):
         self.frame.setLayout(vlayout)
         self.setCentralWidget(self.frame)
 
-        #self.add_sphere()
         self.add_bar()
         self.add_i_frame_attitude()
 
@@ -73,20 +68,24 @@ class Main3D(GeoDef, Qt.QMainWindow):
         OrbMenu         = mainMenu.addMenu('Orbit')
         orbit_action    = Qt.QAction('Show Orbit', self)
         cad_action      = Qt.QAction('Add satellite', self)
+        aries_action    = Qt.QAction('Add vector to Vernal Equinox', self)
+
         orbit_action.triggered.connect(self.add_orbit)
         cad_action.triggered.connect(self.add_spacecraft_2_orbit)
+        aries_action.triggered.connect(self.add_aries_arrow)
 
         OrbMenu.addAction(orbit_action)
         OrbMenu.addAction(cad_action)
+        OrbMenu.addAction(aries_action)
         #--------------------------------------------------------------------------------------------------------------
         # Attitude
         AttMenu         = mainMenu.addMenu('Attitude')
         sat_action      = Qt.QAction('Add satellite', self)
-        frame_action    = Qt.QAction('Add reference frame', self)
+        frame_action    = Qt.QAction('Add Body reference frame', self)
 
         sat_action.triggered.connect(self.add_spacecraft_2_attitude)
         AttMenu.addAction(sat_action)
-        frame_action.triggered.connect(self.add_i_frame_attitude)
+        frame_action.triggered.connect(self.add_b_frame_attitude)
         AttMenu.addAction(frame_action)
         #--------------------------------------------------------------------------------------------------------------
         # Simulation option
@@ -115,7 +114,7 @@ class Main3D(GeoDef, Qt.QMainWindow):
             self.show()
 
     def add_graph2d(self):
-        self.screen = MainGraph(self.dataLog)
+        self.screen = MainGraph(self.datalog)
         self.screen.win.show()
 
     def load_csv_file(self):
@@ -126,46 +125,55 @@ class Main3D(GeoDef, Qt.QMainWindow):
 
         Tk().withdraw()
         filename = askopenfilename()
-        self.dataLog = read_data(filename)
+        dataLog = read_data(filename)
+        self.datalog = DataHandler(dataLog)
+        self.datalog.create_variable()
         print('Data lag created')
 
     def run_simulation(self):
         self.run_flag = True
         self.run_orbit_3d()
         print('Running...')
-        return
 
     def pause_simulation(self):
         self.pause_flag = True
         self.run_flag = False
         print('Paused...')
 
-        return
-
     def stop_simulation(self):
         return
+
+    def resetTime(self):
+        self.countTime = 0
+
+    def updateTime(self):
+        self.countTime += self.datalog.stepTime
 
     def rotate_th(self):
         self.vtk_widget.subplot(0,0)
         i = 1
-        self.simtime.reset()
-        while self.simtime.countTime <= self.simtime.end:
+        self.resetTime()
+        while self.countTime < self.datalog.endTime:
             while self.pause_flag:
                 if self.run_flag:
                     self.pause_flag = False
 
+            # Update Earth
+            self.sphere.rotate_z(10)
+
             # Update Orbit
-            self.sphere.rotate_z((self.earth_gst[i] - self.earth_gst[i - 1])*500)
-            self.current_pos = self.sat_dynamics['Orbital']['Position'][i, :] - self.sat_dynamics['Orbital']['Position'][i - 1, :]
+            self.current_pos = self.datalog.sat_pos_i[i, :] - self.datalog.sat_pos_i[i - 1, :]
             self.spacecraft_in_orbit.translate(self.current_pos)
 
             # Update Attitude
-            self.vtk_widget.update()
-            time.sleep(self.simtime.step/self.time_speed)
+            self.updateAttitude(i)
 
-            # update time
-            self.simtime.countTime += self.simtime.step
-            self.simtime.update_time()
+            # Update widget
+            self.vtk_widget.update()
+            time.sleep(self.datalog.stepTime/self.time_speed)
+
+            # Update time
+            self.updateTime()
             i += 1
         self.thread = None
 
@@ -178,7 +186,19 @@ class Main3D(GeoDef, Qt.QMainWindow):
         self.time_speed = value
         return
 
+    def updateAttitude(self, i):
+        quaternion_ti = Quaternion(self.datalog.q_t_i2b[i, :])
+        inv_quaternion = self.quaternion_t0.inverse
+        d_quaternion = inv_quaternion*quaternion_ti
+        KMatrix = d_quaternion.transformation_matrix
+        self.body_x.transform(KMatrix)
+        self.body_y.transform(KMatrix)
+        self.body_z.transform(KMatrix)
+        self.spacecraft_in_attitude.transform(KMatrix)
+        self.quaternion_t0 = quaternion_ti
+
+
 if __name__ == '__main__':
     app = Qt.QApplication(sys.argv)
-    window = Main3D()
+    window = Viewer()
     sys.exit(app.exec_())
