@@ -2,8 +2,10 @@
 from Spacecraft.Spacecraft import Spacecraft
 from Dynamics.SimTime import SimTime
 from initial_config import initial_config
-from Dynamics.Main_Dynamics import main_dynamics
+from Dynamics.SpacecraftOrbit.MainOrbit import MainOrbit
 from Dynamics.CelestialBody.Ephemeris import Ephemeris
+from Dynamics.SpacecraftAttitude.MainAttitude import MainAttitude
+
 import numpy as np
 import pandas as pd
 import datetime
@@ -13,40 +15,57 @@ deg2rad     = np.pi / 180.0
 rad2deg     = 1 / deg2rad
 
 
-class MainSimulation(main_dynamics):
+class MainSimulation(MainOrbit, MainAttitude, SimTime):
     def __init__(self, initial_properties = initial_config()):
 
         self.main_spacecraft  = Spacecraft(initial_properties[1], None)
-        propagetor_properties = initial_properties[2]
-        orbit_properties      = self.main_spacecraft.orbit_dynamics
-        simulation_time       = SimTime(initial_properties[0])
-        main_dynamics.__init__(self, propagetor_properties, orbit_properties, simulation_time)
+
+        SimTime.__init__(self, initial_properties[0])
+        MainAttitude.__init__(self, initial_properties[1])
+        MainOrbit.__init__(self, initial_properties[2], self.main_spacecraft.orbit_dynamics)
+
         self.earth = Ephemeris()
         date = datetime.datetime.now()
         self.filename = date.strftime('%Y-%m-%d %H-%M-%S')
+        self.pos    = [0, 0, 0]
+        self.vel    = [0, 0, 0]
+        self.quat   = [0, 0, 0]
+        self.omega  = [1, 0, 0, 0]
+        self.long   = 0
+        self.lat    = 0
+        self.alt    = 0
 
     def run_simulation(self):
         self.set_propagator()
         # Loop
-        self.simulation_time.reset()
-        while self.simulation_time.countTime <= self.simulation_time.end:
-            self.simulation_time.progression()
+        self.reset_countTime()
+        while self.maincountTime <= self.endsimTime:
+            self.progressionsimTime()
+            array_time, str_time = self.get_array_time()
 
-            pos, vel = self.update_orbit()
-            quat, omega = self.update_attitude()
+            if self.orbit_update_flag:
+                self.pos, self.vel = self.update_orbit(array_time)
+                self.lat, self.long, self.alt = self.orbit_propagate.TransECItoGeo()
+                self.orbit_update_flag = False
 
-            array_time, str_time = self.simulation_time.get_array_time()
-            lat, long, alt = self.orbit_propagate.TransECItoGeo()
+            if self.attitude_update_flag:
+                self.quat, self.omega = self.update_attitude()
+                self.attitude_update_flag = False
 
-            if self.simulation_time.log_flag:
-                self.main_spacecraft.update_spacecraft_dynamics(pos, vel, quat, omega, lat, long, alt)
-
-                self.main_spacecraft.update_spacecraft_state(str_time, self.simulation_time.countTime)
+            if self.log_flag:
+                self.main_spacecraft.update_spacecraft_dynamics(self.pos,
+                                                                self.vel,
+                                                                self.quat,
+                                                                self.omega,
+                                                                self.lat,
+                                                                self.long,
+                                                                self.alt)
+                self.main_spacecraft.update_spacecraft_state(str_time, self.maincountTime)
                 self.earth.gst_Update(self.orbit_propagate.current_side)
-                self.simulation_time.log_flag = False
+                self.log_flag = False
 
             # update time
-            self.simulation_time.updateSimtime()
+            self.updateSimtime()
 
         # Data report to create dictionary
         self.main_spacecraft.create_data()
@@ -60,6 +79,6 @@ class MainSimulation(main_dynamics):
         database = pd.DataFrame(master_data, columns=master_data.keys())
         print(database)
 
-        database.to_csv("./Data/log/"+self.filename+".csv", index=False, header=True)
+        database.to_csv("./Data/logs/"+self.filename+".csv", index=False, header=True)
         print("Data created")
 

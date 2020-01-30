@@ -5,15 +5,14 @@ Created on Fri Jan 17 03:00:38 2020
 @author: EO
 """
 
-from .SpacecraftOrbit.EarthCenterOrbit.EarthCenter import earthcenterorbit
+from .EarthCenterOrbit.EarthCenter import earthcenterorbit
 
 
-class main_dynamics(object):
-    def __init__(self, propagation_properties, orbit_properties, simtime_class):
+class MainOrbit(object):
+    def __init__(self, propagation_properties, orbit_properties):
 
         self.orbit_properties       = orbit_properties
         self.propagation_properties = propagation_properties
-        self.simulation_time        = simtime_class
 
     def set_propagator(self):
         if self.propagation_properties[0]['propagate_mode'] == 0:
@@ -28,10 +27,6 @@ class main_dynamics(object):
         elif self.propagation_properties[0]['propagate_mode'] == 3:
             print('3')
 
-    def update_orbit(self):
-        array_time,_ = self.simulation_time.get_array_time()
+    def update_orbit(self, array_time):
         current_position, current_velocity = self.orbit_propagate.propagate_in_earth(array_time)
         return current_position, current_velocity
-
-    def update_attitude(self):
-        return [0,0,0, 1], [0,0,0]

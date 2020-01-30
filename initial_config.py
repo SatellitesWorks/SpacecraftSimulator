@@ -11,7 +11,7 @@ from datetime import datetime
 
 def TimeSim():
     config = configparser.ConfigParser()
-    config.read("Data/ini/TimeSet.ini", encoding="utf8")
+    config.read("Data/ini/SatelliteSet.ini", encoding="utf8")
     StartYMDHMS                 = config['TIME']['StartYMDHMS']
     if StartYMDHMS == ('Today' or 'TODAY' or 'today'):
         today = datetime.utcnow()
@@ -52,17 +52,17 @@ def SatSim():
 
     # Inertial
     Iner = np.zeros((3, 3))
-    Iner[0, 0] = config['PHYSICAL']['Iner(0)']
-    Iner[0, 1] = config['PHYSICAL']['Iner(1)']
-    Iner[0, 2] = config['PHYSICAL']['Iner(2)']
-    Iner[1, 0] = config['PHYSICAL']['Iner(3)']
-    Iner[1, 1] = config['PHYSICAL']['Iner(4)']
-    Iner[1, 2] = config['PHYSICAL']['Iner(5)']
-    Iner[2, 0] = config['PHYSICAL']['Iner(6)']
-    Iner[2, 1] = config['PHYSICAL']['Iner(7)']
-    Iner[2, 2] = config['PHYSICAL']['Iner(8)']
+    Iner[0, 0] = config['ATTITUDE']['Iner(0)']
+    Iner[0, 1] = config['ATTITUDE']['Iner(1)']
+    Iner[0, 2] = config['ATTITUDE']['Iner(2)']
+    Iner[1, 0] = config['ATTITUDE']['Iner(3)']
+    Iner[1, 1] = config['ATTITUDE']['Iner(4)']
+    Iner[1, 2] = config['ATTITUDE']['Iner(5)']
+    Iner[2, 0] = config['ATTITUDE']['Iner(6)']
+    Iner[2, 1] = config['ATTITUDE']['Iner(7)']
+    Iner[2, 2] = config['ATTITUDE']['Iner(8)']
     # mass
-    mass = float(config['PHYSICAL']['mass'])
+    mass = float(config['ATTITUDE']['mass'])
 
     # orbit
     orbit_tle = config['ORBIT']['orbit_tle']
@@ -110,9 +110,5 @@ def OrbitSim():
     return propagate, calculation, logging
 
 def initial_config():
-    timeset = TimeSim()
-    dynamics_satset  = SatSim()
-    propset = OrbitSim()
-
-    return timeset, dynamics_satset, propset, 0
+    return TimeSim(), SatSim(), OrbitSim(), 0
 

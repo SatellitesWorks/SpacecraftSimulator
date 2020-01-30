@@ -61,7 +61,6 @@ class earthcenterorbit(object):
         return self.position_i, self.velocity_i # [m]
 
     def TransECItoGeo(self):
-        print(self.current_jd)
         self.current_side = _gstime(self.current_jd) # rad
         r = np.sqrt(self.position_i[0]**2 + self.position_i[1]**2)
 

@@ -13,9 +13,9 @@ from Visualization.Viewer import Viewer
 mainSim = MainSimulation()
 dataLog = mainSim.run_simulation() # Datalog => *.Json
 
-# 3D and 2D visualization
-app = Qt.QApplication(sys.argv)
-window = Viewer(dataLog)
-sys.exit(app.exec_())
+# # 3D and 2D visualization
+# app = Qt.QApplication(sys.argv)
+# window = Viewer(dataLog)
+# sys.exit(app.exec_())
 
 
