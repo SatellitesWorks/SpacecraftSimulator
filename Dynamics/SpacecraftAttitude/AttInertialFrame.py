@@ -5,3 +5,8 @@ class AttInertialFrame(object):
     def __init__(self):
         self.l = 0
 
+    def calAngMonInertial(self):
+        return
+
+
+

@@ -50,10 +50,10 @@ class SimTime(object):
         self.start_array        = self.get_array_time()
         self.attitudecountTime  += self.stepsimTime
         self.orbitcountTime     += self.stepsimTime
-        if self.attitudecountTime == self.attitudestep:
+        if abs(self.attitudecountTime - self.attitudestep) < 1e-6:
             self.attitude_update_flag = True
             self.attitudecountTime = 0
-        if self.orbitcountTime == self.orbitstep:
+        if abs(self.orbitcountTime - self.orbitstep) < 1e-6:
             self.orbit_update_flag = True
             self.orbitcountTime = 0
 

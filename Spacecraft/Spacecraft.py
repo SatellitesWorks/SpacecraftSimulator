@@ -14,7 +14,8 @@ class Spacecraft(object):
         self.mass               = dynamics_satproperties['Mass']
         self.Inertia            = dynamics_satproperties['Inertia']
         self.attitude_dynamics  = {'Omega_b': dynamics_satproperties['Omega_b'],
-                                   'Quaternion_i2b': dynamics_satproperties['Quaternion_i2b']}
+                                   'Quaternion_i2b': dynamics_satproperties['Quaternion_i2b'],
+                                   'Inertia': self.Inertia}
         self.orbit_dynamics     = dynamics_satproperties['Orbit_info']
         self.tle                = dynamics_satproperties['TLE']
         self.position_i         = []
@@ -26,6 +27,9 @@ class Spacecraft(object):
         self.alts               = []
         self.currentDateTime    = []
         self.satStepTime        = []
+        self.torque_b           = []
+        self.torque_control     = [0, 0, 0]
+        self.master_data_satellite = {}
 
     # temperature, obc, gyro, acc, etc, time
     def update_spacecraft_state(self, currentDateTime, stepTime):
@@ -41,6 +45,9 @@ class Spacecraft(object):
         self.lats.append(lat)
         self.longs.append(long)
         self.alts.append(alt)
+
+    def update_control_history(self):
+        self.torque_b.append(self.torque_control)
 
     def create_data(self):
         report_attitude = {'omega_t_b(X)[rad/s]': np.array(self.omega_b)[:, 0],
@@ -61,19 +68,23 @@ class Spacecraft(object):
         report_geo = {'lat[rad]' : np.array(self.lats),
                       'lon[rad]': np.array(self.longs),
                       'alt[m]' : np.array(self.alts)}
+
+        report_torque = {'torque_t_b(X)[Nm]': np.array(self.torque_b)[:, 0],
+                         'torque_t_b(Y)[Nm]': np.array(self.torque_b)[:, 1],
+                         'torque_t_b(Z)[Nm]': np.array(self.torque_b)[:, 2]}
         
         report_timelog = {'Date time': self.currentDateTime,
                           'time[sec]': self.satStepTime}
 
-        self.master_data_satellite = {**report_timelog, **report_attitude, **report_orbit, **report_geo}
+        self.master_data_satellite = {**report_timelog, **report_attitude, **report_torque, **report_orbit, **report_geo}
 
+    def generate_torque_b(self, inputs_to_control):
+        # Sector de MAgia negra y sale el torque
+        self.torque_control = [0, 0, 0]
+        return self.torque_control
 
-    def Generate_torque_b(self):
-        return
-
-
-    def generate_force_b(self):
-
-        return
+    def generate_force_b(self, inputs_to_control):
+        # Sector de MAgia negra y sale la fuerza
+        return [0, 0, 0]
 
 

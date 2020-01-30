@@ -39,12 +39,12 @@ def SatSim():
     config = configparser.ConfigParser()
     config.read("Data/ini/SatelliteSet.ini", encoding="utf8")
     #Rotational speed [rad/s]
-    Omega_b = np.zeros((3, 1))
+    Omega_b = np.zeros(3)
     Omega_b[0] = config['ATTITUDE']['Omega_b(0)']
     Omega_b[1] = config['ATTITUDE']['Omega_b(1)']
     Omega_b[2] = config['ATTITUDE']['Omega_b(2)']
     # QuaternionCi2bC
-    Quaternion_i2b = np.zeros((4, 1))
+    Quaternion_i2b = np.zeros(4)
     Quaternion_i2b[0] = config['ATTITUDE']['Quaternion_i2b(0)']
     Quaternion_i2b[1] = config['ATTITUDE']['Quaternion_i2b(1)']
     Quaternion_i2b[2] = config['ATTITUDE']['Quaternion_i2b(2)']
