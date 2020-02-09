@@ -9,6 +9,7 @@ from Library.Pyorbital.pyorbital import tlefile
 import numpy as np
 from datetime import datetime
 
+
 def TimeSim():
     config = configparser.ConfigParser()
     config.read("Data/ini/SatelliteSet.ini", encoding="utf8")
@@ -16,6 +17,7 @@ def TimeSim():
     if StartYMDHMS == ('Today' or 'TODAY' or 'today'):
         today = datetime.utcnow()
         StartYMDHMS = today.strftime("%Y/%m/%d %H:%M:%S")
+
     EndTimeSec                  = float(config['TIME']['EndTimeSec'])
     StepTimeSec                 = float(config['TIME']['StepTimeSec'])
     OrbitPropagateStepTimeSec   = float(config['TIME']['OrbitPropagateStepTimeSec'])

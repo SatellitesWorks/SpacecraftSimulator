@@ -8,6 +8,7 @@ from datetime import datetime
 
 
 class SimTime(object):
+
     def __init__(self,
                  time_properties):
         start_string        = time_properties['StartTime']
@@ -27,7 +28,7 @@ class SimTime(object):
         # Auxiliary variable for orbit, attitude and thermal update
         self.orbitstep              = time_properties['OrbStepTime']  # Orbit Step
         self.attitudestep           = time_properties['PropStepSec']  # Attitude step
-        self.attitude_update_flag   = True # Flag Attitude Step
+        self.attitude_update_flag   = False # Flag Attitude Step
         self.orbit_update_flag      = True # Flag for Orbit Step
         self.attitudecountTime      = 0  # Count for Attitude Step
         self.orbitcountTime         = 0  # Count for Orbit Step
@@ -48,11 +49,8 @@ class SimTime(object):
         self.startsimTime       += self.stepsimTime
         self.maincountTime      += self.stepsimTime
         self.start_array        = self.get_array_time()
-        self.attitudecountTime  += self.stepsimTime
         self.orbitcountTime     += self.stepsimTime
-        if abs(self.attitudecountTime - self.attitudestep) < 1e-6:
-            self.attitude_update_flag = True
-            self.attitudecountTime = 0
+
         if abs(self.orbitcountTime - self.orbitstep) < 1e-6:
             self.orbit_update_flag = True
             self.orbitcountTime = 0
