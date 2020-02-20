@@ -10,8 +10,8 @@ from astropy.time import Time
 import astropy.units as u
 
 class Ephemeris(Earth):
-    def __init__(self):
-        Earth.__init__(self)
+    def __init__(self, wgs):
+        Earth.__init__(self, wgs)
 
     def Earth(self):
         self.Earth()

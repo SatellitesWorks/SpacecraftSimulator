@@ -5,6 +5,8 @@ Created on Fri Jan 17 05:17:52 2020
 @author: EO
 """
 from datetime import datetime
+from Library.sgp4 import ext
+from Library.math_sup.tools_reference_frame import JdToDecyear
 
 
 class SimTime(object):
@@ -14,10 +16,17 @@ class SimTime(object):
         start_string        = time_properties['StartTime']
         datetime_array      = datetime.strptime(start_string, '%Y/%m/%d %H:%M:%S')
         self.startsimTime   = datetime_array.timestamp()
-        self.start_array    = self.get_array_time()
+        self.currentsimTime = self.startsimTime
+        self.current_array, _ = self.get_array_time()
         self.endsimTime     = time_properties['EndTime']
         self.simspeedTime   = time_properties['SimulationSpeed']
-
+        self.current_jd      = ext.jday(self.current_array[0],
+                                        self.current_array[1],
+                                        self.current_array[2],
+                                        self.current_array[3],
+                                        self.current_array[4],
+                                        self.current_array[5])
+        self.current_decyaer = JdToDecyear(self.current_jd)
         # Principal Time variable
         self.stepsimTime    = time_properties['StepTime'] # principal Step
         self.maincountTime  = 0 # Count for Principal Step
@@ -36,21 +45,27 @@ class SimTime(object):
         print('Simulation start Time:' + start_string)
 
     def get_array_time(self):
-        datetime_array = datetime.fromtimestamp(self.startsimTime)
-        start_array = [datetime_array.year,
-                       datetime_array.month,
-                       datetime_array.day,
-                       datetime_array.hour,
-                       datetime_array.minute,
-                       datetime_array.second + datetime_array.microsecond/1e6]
-        return start_array, datetime_array.strftime('%Y-%m-%d %H-%M-%S')
+        datetime_array = datetime.fromtimestamp(self.currentsimTime)
+        currenttime_array = [datetime_array.year,
+                             datetime_array.month,
+                             datetime_array.day,
+                             datetime_array.hour,
+                             datetime_array.minute,
+                             datetime_array.second + datetime_array.microsecond/1e6]
+        return currenttime_array, datetime_array.strftime('%Y-%m-%d %H-%M-%S')
 
     def updateSimtime(self):
-        self.startsimTime       += self.stepsimTime
+        self.currentsimTime     += self.stepsimTime
         self.maincountTime      += self.stepsimTime
-        self.start_array        = self.get_array_time()
+        self.current_array, _    = self.get_array_time()
+        self.current_jd      = ext.jday(self.current_array[0],
+                                        self.current_array[1],
+                                        self.current_array[2],
+                                        self.current_array[3],
+                                        self.current_array[4],
+                                        self.current_array[5])
+        self.current_decyaer = JdToDecyear(self.current_jd)
         self.orbitcountTime     += self.stepsimTime
-
         if abs(self.orbitcountTime - self.orbitstep) < 1e-6:
             self.orbit_update_flag = True
             self.orbitcountTime = 0
@@ -58,7 +73,9 @@ class SimTime(object):
         self.update_log_count()
 
     def progressionsimTime(self):
-        return print(round(100*self.maincountTime/self.endsimTime, 2), '%')
+        val = round(100*self.maincountTime/self.endsimTime, 2)
+        if val % 5 == 0:
+            print(val, '%')
 
     def reset_countTime(self):
         self.maincountTime      = 0

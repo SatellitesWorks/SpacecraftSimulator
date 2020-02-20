@@ -27,7 +27,7 @@ class Quaternions(object):
 
     def frame_conv(self, v):
         dcm = self.todcm()
-        ans = dcm*v
+        ans = dcm.dot(v)
         return ans
 
     def todcm(self):

@@ -47,4 +47,4 @@ class Satellite(object):
         j = jday(year, month, day, hour, minute, second)
         m = (j - self.jdsatepoch) * minutes_per_day
         r, v = sgp4(self, m)
-        return r, v, j # Add Julian date
+        return r, v

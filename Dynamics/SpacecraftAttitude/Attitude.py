@@ -47,16 +47,16 @@ class Attitude(object):
             self.attitude_update_flag = True
         self.calangmom()
 
-    def add_ext_torque(self, ext_torque_b):
+    def add_ext_torque_b(self, ext_torque_b):
         self.ext_torque_b += ext_torque_b
 
-    def add_ext_force(self, ext_force_b):
+    def add_ext_force_b(self, ext_force_b):
         self.ext_force_b += ext_force_b
 
-    def add_int_torque(self, torque_b):
+    def add_int_torque_b(self, torque_b):
         self.torque_b += torque_b
 
-    def add_int_force(self, force_b):
+    def add_int_force_b(self, force_b):
         self.force_b += force_b
 
     def dynamics_and_kinematics(self, x, t):
