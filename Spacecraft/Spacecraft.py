@@ -16,8 +16,8 @@ class Spacecraft(object):
         self.attitude_dynamics  = {'Omega_b': dynamics_satproperties['Omega_b'],
                                    'Quaternion_i2b': dynamics_satproperties['Quaternion_i2b'],
                                    'Inertia': self.Inertia}
-        self.orbit_dynamics     = dynamics_satproperties['Orbit_info']
-        self.tle                = dynamics_satproperties['TLE']
+        #self.orbit_dynamics     = dynamics_satproperties['Orbit_info']
+        #self.tle                = dynamics_satproperties['TLE']
         self.position_i         = []
         self.velocity_i         = []
         self.quaternion_b       = []

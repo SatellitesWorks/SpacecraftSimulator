@@ -10,36 +10,50 @@ import numpy as np
 from datetime import datetime
 
 
+class InitialConfig(object):
+    def __init__(self):
+        self.tle_name = 'suchai'
+        self.time_properties = TimeSim()
+        self.spacecraft_properties = SatSim()
+        self.orbit_properties = OrbitSim()
+        self.environment_properties = EnvSim()
+        return
+
+
 def TimeSim():
     config = configparser.ConfigParser()
-    config.read("Data/ini/SatelliteSet.ini", encoding="utf8")
-    StartYMDHMS                 = config['TIME']['StartYMDHMS']
+    config.read("Data/ini/Spacecraft.ini", encoding="utf8")
+    StartYMDHMS = config['TIME']['StartYMDHMS']
     if StartYMDHMS == ('Today' or 'TODAY' or 'today'):
         today = datetime.utcnow()
         StartYMDHMS = today.strftime("%Y/%m/%d %H:%M:%S")
 
-    EndTimeSec                  = float(config['TIME']['EndTimeSec'])
-    StepTimeSec                 = float(config['TIME']['StepTimeSec'])
-    OrbitPropagateStepTimeSec   = float(config['TIME']['OrbitPropagateStepTimeSec'])
-    LogPeriod                   = float(config['TIME']['LogPeriod'])
-    SimulationSpeed             = float(config['TIME']['SimulationSpeed'])
+    EndTimeSec = float(config['TIME']['EndTimeSec'])
+    StepTimeSec = float(config['TIME']['StepTimeSec'])
+    OrbitPropagateStepTimeSec = float(config['TIME']['OrbitPropagateStepTimeSec'])
+    LogPeriod = float(config['TIME']['LogPeriod'])
+    SimulationSpeed = float(config['TIME']['SimulationSpeed'])
     PropStepSec = float(config['ATTITUDE']['PropStepSec'])
-    timesim = {'StartTime'      : StartYMDHMS,
-               'EndTime'        : EndTimeSec,
-               'StepTime'       : StepTimeSec,
-               'OrbStepTime'    : OrbitPropagateStepTimeSec,
-               'LogPeriod'      : LogPeriod,
+    PropStepSec_Thermal = float(config['THERMAL']['PropStepSec_Thermal'])
+    timesim = {'StartTime': StartYMDHMS,
+               'EndTime': EndTimeSec,
+               'StepTime': StepTimeSec,
+               'OrbStepTime': OrbitPropagateStepTimeSec,
+               'LogPeriod': LogPeriod,
                'SimulationSpeed': SimulationSpeed,
-               'PropStepSec'    : PropStepSec}
+               'PropStepSec': PropStepSec,
+               'PropStepSec_Thermal': PropStepSec_Thermal}
     return timesim
+
 
 def tleSim(tle_name):
     tle = tlefile.read(tle_name, 'tle/'+tle_name+'.txt')
     return tle
 
+
 def SatSim():
     config = configparser.ConfigParser()
-    config.read("Data/ini/SatelliteSet.ini", encoding="utf8")
+    config.read("Data/ini/Spacecraft.ini", encoding="utf8")
     #Rotational speed [rad/s]
     Omega_b = np.zeros(3)
     Omega_b[0] = config['ATTITUDE']['Omega_b(0)']
@@ -65,20 +79,35 @@ def SatSim():
     Iner[2, 2] = config['ATTITUDE']['Iner(8)']
     # mass
     mass = float(config['ATTITUDE']['mass'])
+    satset = {'Omega_b': Omega_b,
+              'Quaternion_i2b': Quaternion_i2b,
+              'Inertia': Iner,
+              'Mass': mass}
+    return satset
 
+
+def OrbitSim():
+    config      = configparser.ConfigParser()
+    config.read("Data/ini/Orbit.ini", encoding="utf8")
     # orbit
     orbit_tle = config['ORBIT']['orbit_tle']
-
+    calculation = config['ORBIT']['calculation']
+    logging     = config['ORBIT']['logging']
+    propagate   = {}
+    propagate_mode = float(config['PROPAGATION']['propagate_mode'])
+    propagate['propagate_mode'] = propagate_mode
+    if propagate_mode == 1:
+        wgs = float(config['PROPAGATION']['wgs'])
+        propagate['wgs'] = wgs
     if orbit_tle:
         tle_name = config['ORBIT']['tle_name']
         tle_info = tleSim(tle_name)
 
-        satset = {'Omega_b': Omega_b,
-                  'Quaternion_i2b': Quaternion_i2b,
-                  'Inertia': Iner,
-                  'Mass': mass,
-                  'Orbit_info': [tle_info.line1, tle_info.line2],
-                  'TLE': True}
+        orbitset = {'Orbit_info': [tle_info.line1, tle_info.line2],
+                    'TLE': True,
+                    'propagate': propagate,
+                    'calculation': calculation,
+                    'logging': logging}
     else:
         # position
         r = np.zeros((3, 1))
@@ -90,27 +119,19 @@ def SatSim():
         v[0] = config['ORBIT']['vx']
         v[1] = config['ORBIT']['vy']
         v[2] = config['ORBIT']['vz']
-        satset = {'Omega_b': Omega_b,
-                  'Quaternion_i2b': Quaternion_i2b,
-                  'Inertia': Iner,
-                  'Mass': mass,
-                  'Orbit_info': [r, v],
-                  'TLE': False}
-    return satset
 
-def OrbitSim():
-    config      = configparser.ConfigParser()
-    config.read("Data/ini/OrbitSet.ini", encoding="utf8")
-    calculation = config['ORBIT']['calculation']
-    logging     = config['ORBIT']['logging']
-    propagate   = {}
-    propagate_mode = float(config['PROPAGATION']['propagate_mode'])
-    propagate['propagate_mode'] = propagate_mode
-    if propagate_mode == 1:
-        wgs = float(config['PROPAGATION']['wgs'])
-        propagate['wgs'] = wgs
-    return propagate, calculation, logging
+        orbitset = {'Orbit_info': [r, v],
+                    'TLE': False,
+                    'propagate': propagate,
+                    'calculation': calculation,
+                    'logging': logging}
+    return orbitset
 
-def initial_config():
-    return TimeSim(), SatSim(), OrbitSim(), 0
+def EnvSim():
+    config = configparser.ConfigParser()
+    config.read("Data/ini/Environment.ini", encoding="utf8")
+
+    return 0
+
+
 

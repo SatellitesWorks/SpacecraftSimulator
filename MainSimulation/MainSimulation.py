@@ -1,7 +1,7 @@
 
 from Spacecraft.Spacecraft import Spacecraft
 from Dynamics.SimTime import SimTime
-from initial_config import initial_config
+from initial_config import InitialConfig
 from Dynamics.SpacecraftOrbit.MainOrbit import MainOrbit
 from Dynamics.CelestialBody.Ephemeris import Ephemeris
 from Dynamics.SpacecraftAttitude.Attitude import Attitude
@@ -17,14 +17,16 @@ deg2rad = np.pi / 180.0
 rad2deg = 1 / deg2rad
 
 
-class MainSimulation(MainOrbit, Attitude, SimTime, Environment, Ephemeris, Disturbances):
-    def __init__(self, initial_properties = initial_config()):
+class MainSimulation(InitialConfig, MainOrbit, Attitude, SimTime, Environment, Ephemeris, Disturbances):
+    def __init__(self):
 
-        self.main_spacecraft  = Spacecraft(initial_properties[1], None)
+        InitialConfig.__init__(self)
 
-        SimTime.__init__(self, initial_properties[0])
+        self.main_spacecraft  = Spacecraft(self.spacecraft_properties, None)
+
+        SimTime.__init__(self, self.time_properties)
         Attitude.__init__(self, self.main_spacecraft.attitude_dynamics,  self.attitudestep, self.attitude_update_flag)
-        MainOrbit.__init__(self, initial_properties[2], self.main_spacecraft.orbit_dynamics)
+        MainOrbit.__init__(self, self.orbit_properties)
         Ephemeris.__init__(self, self.wgs)
         Environment.__init__(self, self.radiusearthkm)
         Disturbances.__init__(self)
@@ -84,6 +86,7 @@ class MainSimulation(MainOrbit, Attitude, SimTime, Environment, Ephemeris, Distu
                                                                 self.current_lat,
                                                                 self.current_long,
                                                                 self.current_alt)
+
                 self.main_spacecraft.update_spacecraft_state(str_time, self.maincountTime)
                 self.main_spacecraft.update_control_history()
                 self.gst_Update()

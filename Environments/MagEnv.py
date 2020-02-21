@@ -37,15 +37,6 @@ class MagEnv(object):
         mag_local_yz = rotationZ(mag_local_0y, -lonrad)
         self.Mag_i   = rotationZ(mag_local_yz, -gmst)
 
-        #sinlat = np.sin(lat)
-        #sinlon = np.sin(lonrad)
-        #coslat = np.cos(lat)
-        #coslon = np.cos(lonrad)
-
-        #self.Mag_i[0] = -sinlat*coslon*mag_0[0] - sinlon*mag_0[1] - coslat*coslon*mag_0[2]
-        #self.Mag_i[1] = -sinlat*sinlon*mag_0[0] + coslon*mag_0[1] - coslat*sinlon*mag_0[2]
-        #self.Mag_i[2] = coslat*mag_0[0] - sinlat*mag_0[2]
-
 
 
 
