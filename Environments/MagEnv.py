@@ -8,11 +8,10 @@ DEG2RAD = 1/RAD2DEG
 
 
 class MagEnv(object):
-    def __init__(self, radius):
+    def __init__(self, mag_properties):
         self.Mag_i = np.zeros(3)
         self.Mag_b = np.zeros(3)
         self.calcmagflag = True
-        self.radiusearthkm = radius
 
     def calc_mag(self, decyear, sideral, lat, lon, alt, q_i2b):
         if not self.calcmagflag:
@@ -36,6 +35,9 @@ class MagEnv(object):
         mag_local_0y = rotationY(mag_0, np.pi - theta)
         mag_local_yz = rotationZ(mag_local_0y, -lonrad)
         self.Mag_i   = rotationZ(mag_local_yz, -gmst)
+
+    def get_mag_b(self):
+        return self.Mag_b
 
 
 
