@@ -6,7 +6,8 @@ Created on Wed Jan 15 11:19:53 2020
 
 from Spacecraft.Spacecraft import Spacecraft
 from Dynamics.SimTime import SimTime
-from Interface.initial_config import InitialConfig
+from Interface.Initializer import InitialConfig
+from Interface.Logger import Logger
 from Dynamics.SpacecraftOrbit.MainOrbit import MainOrbit
 from Dynamics.CelestialBody.Ephemeris import Ephemeris
 from Dynamics.SpacecraftAttitude.Attitude import Attitude
@@ -22,18 +23,17 @@ deg2rad = np.pi / 180.0
 rad2deg = 1 / deg2rad
 
 
-class MainSimulation(InitialConfig, MainOrbit, SimTime, Ephemeris):
+class MainSimulation(InitialConfig, Logger, MainOrbit, SimTime):
     def __init__(self):
 
         InitialConfig.__init__(self)
-
-        self.main_spacecraft  = Spacecraft(self.spacecraft_properties, None)
-
+        Logger.__init__(self, self.logger_properties)
         SimTime.__init__(self, self.time_properties)
         MainOrbit.__init__(self, self.orbit_properties)
-        Ephemeris.__init__(self, self.wgs)
 
-        self.attitude = Attitude(self.main_spacecraft.attitude_dynamics, self.attitudestep, self.attitude_update_flag)
+        self.spacecraft = Spacecraft(self.spacecraft_properties, self.components_properties)
+        self.ephemeris = Ephemeris(self.wgs)
+        self.attitude = Attitude(self.spacecraft.attitude_dynamics, self.attitudestep)
         self.environment = Environment(self.environment_properties)
         self.disturbance = Disturbances(self.disturbance_properties)
 
@@ -58,9 +58,9 @@ class MainSimulation(InitialConfig, MainOrbit, SimTime, Ephemeris):
             # current orbit position, velocity
             if self.orbit_update_flag:
                 self.update_orbit(array_time)
-                self.getSideral(self.current_jd)
+                self.ephemeris.getSideral(self.current_jd)
                 self.current_lat, self.current_long, self.current_alt = self.orbit_propagate.TransECItoGeo(
-                    self.current_sideral)
+                    self.ephemeris.current_sideral)
                 self.orbit_update_flag = False
 
             # current Attitude
@@ -68,7 +68,7 @@ class MainSimulation(InitialConfig, MainOrbit, SimTime, Ephemeris):
 
             # current Environment and disturbances
             self.environment.update_environment(self.current_decyaer,
-                                                self.current_sideral,
+                                                self.ephemeris.current_sideral,
                                                 self.current_lat,
                                                 self.current_long,
                                                 self.current_alt,
@@ -86,33 +86,33 @@ class MainSimulation(InitialConfig, MainOrbit, SimTime, Ephemeris):
 
             if self.log_flag:
                 self.progressionsimTime()
-                self.main_spacecraft.update_spacecraft_dynamics(self.current_position,
-                                                                self.current_velocity,
-                                                                self.attitude.current_quaternion_i2b(),
-                                                                self.attitude.current_omega_b,
-                                                                self.attitude.h_total_norm,
-                                                                self.attitude.total_torque_b(),
-                                                                self.current_lat,
-                                                                self.current_long,
-                                                                self.current_alt)
+                self.spacecraft.update_spacecraft_dynamics(self.current_position,
+                                                           self.current_velocity,
+                                                           self.attitude.current_quaternion_i2b(),
+                                                           self.attitude.current_omega_b,
+                                                           self.attitude.h_total_norm,
+                                                           self.attitude.total_torque_b(),
+                                                           self.current_lat,
+                                                           self.current_long,
+                                                           self.current_alt)
 
-                self.main_spacecraft.update_spacecraft_components(str_time, self.maincountTime)
+                self.spacecraft.update_spacecraft_components(str_time, self.maincountTime)
 
-                self.gst_Update()
+                self.ephemeris.gst_Update()
                 self.log_flag = False
 
             # update time
             self.updateSimtime()
 
         # Data report to create dictionary
-        self.main_spacecraft.create_data()
+        self.spacecraft.create_data()
 
         # Save Dataframe pandas in csv file
         self.save_data()
         print('Finished')
 
     def save_data(self):
-        master_data = {**self.main_spacecraft.master_data_satellite, **self.historical_gst}
+        master_data = {**self.spacecraft.master_data_satellite, **self.ephemeris.historical_gst}
         database = pd.DataFrame(master_data, columns=master_data.keys())
         database.to_csv("./Data/logs/"+self.filename+".csv", index=False, header=True)
         print("Data created")

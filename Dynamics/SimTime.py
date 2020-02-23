@@ -37,7 +37,6 @@ class SimTime(object):
         # Auxiliary variable for orbit, attitude and thermal update
         self.orbitstep              = time_properties['OrbStepTime']  # Orbit Step
         self.attitudestep           = time_properties['PropStepSec']  # Attitude step
-        self.attitude_update_flag   = False # Flag Attitude Step
         self.orbit_update_flag      = True # Flag for Orbit Step
         self.attitudecountTime      = 0  # Count for Attitude Step
         self.orbitcountTime         = 0  # Count for Orbit Step

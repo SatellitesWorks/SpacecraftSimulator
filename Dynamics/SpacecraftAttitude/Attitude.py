@@ -10,10 +10,11 @@ from Library.math_sup.Quaternion import Quaternions
 
 
 class Attitude(object):
-    def __init__(self, properties_sim_spacecraft, attstep, attitude_flag):
+    def __init__(self, properties_sim_spacecraft, attstep):
         self.attitudestep           = attstep
-        self.attitude_update_flag   = attitude_flag
         self.attitudecountTime      = 0
+        # First time is False to not update the init data
+        self.attitude_update_flag   = False
 
         # quaternion = [i, j, k, 1]
         self.current_quaternion_i2b = Quaternions(properties_sim_spacecraft['Quaternion_i2b'])
@@ -38,13 +39,14 @@ class Attitude(object):
 
     def update_attitude(self, current_simtime):
         if self.attitude_update_flag:
-            while abs(current_simtime - self.attitudecountTime - self.attitudestep) > 1e-6:
+            while np.abs(current_simtime - self.attitudecountTime - self.attitudestep) > 1e-6:
                 self.rungeonestep(self.attitudecountTime, self.attitudestep)
                 self.attitudecountTime += self.attitudestep
             self.rungeonestep(self.attitudecountTime, self.attitudestep)
             self.attitudecountTime = current_simtime
         else:
             self.attitude_update_flag = True
+
         self.calangmom()
         self.reset_var_b()
 

@@ -12,13 +12,21 @@ from datetime import datetime
 
 class InitialConfig(object):
     def __init__(self):
-        self.tle_name = 'suchai'
         self.time_properties = TimeSim()
-        self.spacecraft_properties = SatSim()
+        self.spacecraft_properties, self.components_properties = SatSim()
         self.orbit_properties = OrbitSim()
         self.environment_properties = EnvSim()
         self.disturbance_properties = DistSim()
-        return
+        self.logger_properties = self.LogSim()
+
+    def LogSim(self):
+        properties = {'orb_log': self.orbit_properties['logging'],
+                      'env_mag_log': self.environment_properties['MAG']['mag_logging'],
+                      'env_atm_log': self.environment_properties['ATM']['atm_logging'],
+                      'env_srp_log': self.environment_properties['SRP']['srp_logging'],
+                      'dis_mag_log': self.disturbance_properties['MAG']['mag_logging'],
+                      'dis_gra_log': self.disturbance_properties['GRA']['gra_logging']}
+        return properties
 
 
 def TimeSim():
@@ -48,7 +56,7 @@ def TimeSim():
 
 
 def tleSim(tle_name):
-    tle = tlefile.read(tle_name, 'tle/'+tle_name+'.txt')
+    tle = tlefile.read(tle_name, 'tle/' + tle_name + '.txt')
     return tle
 
 
@@ -57,7 +65,7 @@ def SatSim():
     config.read("Data/ini/Spacecraft.ini", encoding="utf8")
     spacecraft_name = config['NAME']['spacecraft_name']
 
-    #Rotational speed [rad/s]
+    # Rotational speed [rad/s]
     Omega_b = np.zeros(3)
     Omega_b[0] = config['ATTITUDE']['Omega_b(0)']
     Omega_b[1] = config['ATTITUDE']['Omega_b(1)']
@@ -87,17 +95,28 @@ def SatSim():
               'Inertia': Iner,
               'Mass': mass,
               'spacecraft_name': spacecraft_name}
-    return satset
+
+    file_components = config['COMPONENTS']['file_components']
+    comset = {'path_com': file_components,
+              'gyro_flag': config['COMPONENTS']['gyro'],
+              'obc_flag': config['COMPONENTS']['obc'],
+              'power_flag': config['COMPONENTS']['power'],
+              'rw_flag': config['COMPONENTS']['rw'],
+              'thruster_flag': config['COMPONENTS']['thruster'],
+              'stt_flag': config['COMPONENTS']['stt'],
+              'ss_flag': config['COMPONENTS']['ss']}
+
+    return satset, comset
 
 
 def OrbitSim():
-    config      = configparser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read("Data/ini/Orbit.ini", encoding="utf8")
     # orbit
     orbit_tle = config['ORBIT']['orbit_tle']
     calculation = config['ORBIT']['calculation']
-    logging     = config['ORBIT']['logging']
-    propagate   = {}
+    logging = config['ORBIT']['logging']
+    propagate = {}
     propagate_mode = float(config['PROPAGATION']['propagate_mode'])
     propagate['propagate_mode'] = propagate_mode
     if propagate_mode == 1:
@@ -237,4 +256,3 @@ def DistSim():
                               'MAG': mag_properties,
                               'SFF': sff_properties}
     return disturbance_properties
-
