@@ -1,9 +1,10 @@
 
 
 from .InitGyro import InitGyro
+from .InitRWModel import InitRWModel
 
 
-class InitCom(InitGyro):
+class InitCom(InitGyro, InitRWModel):
     def __init__(self, properties):
         self.gyro_properties    = None
         self.obc_properties     = None
@@ -16,15 +17,15 @@ class InitCom(InitGyro):
         self.path_com = properties['path_com']
         if properties['gyro_flag']:
             InitGyro.__init__(self, self.path_com)
-        elif properties['obc_flag']:
+        if properties['obc_flag']:
             k = 0
-        elif properties['power_flag']:
+        if properties['power_flag']:
             k = 0
-        elif properties['rw_flag']:
+        if properties['rw_flag']:
+            InitRWModel.__init__(self, self.path_com)
+        if properties['thruster_flag']:
             k = 0
-        elif properties['thruster_flag']:
+        if properties['stt_flag']:
             k = 0
-        elif properties['stt_flag']:
-            k = 0
-        elif properties['ss_flag']:
+        if properties['ss_flag']:
             k = 0

@@ -17,10 +17,12 @@ class MagEnv(object):
         if not self.calcmagflag:
             return
         alt /= 1000
-        # itype = 1 if geodetic(spheroid)
-        # itype = 2 if geocentric(sphere)
-        # alt   = height in km above sea level if itype = 1
-        #     = distance from centre of Earth in km if itype = 2 (>3485 km)
+        """
+         itype = 1 if geodetic(spheroid)
+         itype = 2 if geocentric(sphere)
+         alt   = height in km above sea level if itype = 1
+               = distance from centre of Earth in km if itype = 2 (>3485 km)
+        """
         x, y, z, f, gccolat = calculate_igrf(0, decyear, alt, lat, lon, itype=1)
         mag_local = [x, y, z]
 
@@ -38,10 +40,3 @@ class MagEnv(object):
 
     def get_mag_b(self):
         return self.Mag_b
-
-
-
-
-
-
-

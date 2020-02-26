@@ -50,8 +50,8 @@ class SimTime(object):
                              datetime_array.day,
                              datetime_array.hour,
                              datetime_array.minute,
-                             datetime_array.second + datetime_array.microsecond/1e6]
-        return currenttime_array, datetime_array.strftime('%Y-%m-%d %H-%M-%S')
+                             datetime_array.second]# + datetime_array.microsecond/1e6]
+        return currenttime_array, datetime_array.strftime('%Y-%m-%d %H:%M:%S')
 
     def updateSimtime(self):
         self.currentsimTime     += self.stepsimTime

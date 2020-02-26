@@ -15,6 +15,7 @@ class Gyro(object):
         self.range_to_zero = properties['Range_to_zero']
         self.current_omega_c = np.zeros(3)
         self.historical_omega_c = []
+        print(' - Gyro added')
 
     def measure(self, omega_b):
         self.RangeCheck()
