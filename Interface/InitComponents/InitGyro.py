@@ -64,3 +64,4 @@ class InitGyro(object):
                                 'Range_to_const': Range_to_const,
                                 'Range_to_zero': Range_to_zero,
                                 'current': current}
+        print(' - Gyro added')

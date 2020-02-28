@@ -1,3 +1,0 @@
-Node_id,Node_label,capacity,alpha,area,normal_v_b_x,normal_v_b_y,normal_v_b_z,initial_internal_heat,initial_temperature
-0,BUS,880,0,0.5,1,0,0,0,300
-1,SAP,880,0,0.5,0,1,1,0,350

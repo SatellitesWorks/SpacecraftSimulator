@@ -10,18 +10,18 @@ from Library.math_sup.Quaternion import Quaternions
 
 
 class Attitude(object):
-    def __init__(self, properties_sim_spacecraft, attstep):
-        self.attitudestep           = attstep
+    def __init__(self, attitude_spacecraft):
+        self.attitudestep           = attitude_spacecraft['attitudestep']
         self.attitudecountTime      = 0
         # First time is False to not update the init data
         self.attitude_update_flag   = False
 
         # quaternion = [i, j, k, 1]
-        self.current_quaternion_i2b = Quaternions(properties_sim_spacecraft['Quaternion_i2b'])
+        self.current_quaternion_i2b = Quaternions(attitude_spacecraft['Quaternion_i2b'])
 
-        self.current_omega_b        = np.array(properties_sim_spacecraft['Omega_b'])
+        self.current_omega_b        = np.array(attitude_spacecraft['Omega_b'])
 
-        self.Inertia                = properties_sim_spacecraft['Inertia']
+        self.Inertia                = attitude_spacecraft['Inertia']
         self.inv_Inertia            = np.linalg.inv(self.Inertia)
 
         self.current_h_rw_b     = np.zeros(3)

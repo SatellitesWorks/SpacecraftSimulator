@@ -8,7 +8,8 @@ deg2rad     = np.pi / 180.0
 
 class Earth(object):
     def __init__(self, wgs):
-        self.historical_gst = {}
+        self.historical_gst = []
+        self.h_gst = {}
         self.current_sideral = 0
         self.radiusearthkm = 6378.315 #km
         if wgs == 0:
@@ -21,9 +22,13 @@ class Earth(object):
             print('wgs not used')
 
     def gst_Update(self):
-        self.historical_gst['GST [rad]'] = self.current_sideral
+        self.historical_gst.append(self.current_sideral)
 
     def getSideral(self, current_jd):
         self.current_sideral = gstime(current_jd)
+
+    def create_report(self):
+        self.h_gst = {'GST [rad]': self.historical_gst}
+
 
 

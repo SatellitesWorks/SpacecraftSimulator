@@ -40,7 +40,7 @@ class SimTime(object):
         self.orbit_update_flag      = True # Flag for Orbit Step
         self.attitudecountTime      = 0  # Count for Attitude Step
         self.orbitcountTime         = 0  # Count for Orbit Step
-
+        print("-----------------------------")
         print('Simulation start Time: ' + start_string)
 
     def get_array_time(self):

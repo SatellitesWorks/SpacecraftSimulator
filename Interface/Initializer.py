@@ -13,19 +13,32 @@ from datetime import datetime
 class InitialConfig(object):
     def __init__(self):
         self.time_properties = TimeSim()
-        self.spacecraft_properties, self.components_properties = SatSim()
-        self.orbit_properties = OrbitSim()
+        spacecraft_properties, self.components_properties = SatSim()
+        orbit_properties = OrbitSim()
+        self.spacecraft_properties ={'Attitude': spacecraft_properties,
+                                     'Orbit': orbit_properties}
         self.environment_properties = EnvSim()
         self.disturbance_properties = DistSim()
         self.logger_properties = self.LogSim()
+        self.ephemeris_properties = self.EphSim()
 
     def LogSim(self):
-        properties = {'orb_log': self.orbit_properties['logging'],
+        properties = {'orb_log': self.spacecraft_properties['Orbit']['logging'],
                       'env_mag_log': self.environment_properties['MAG']['mag_logging'],
                       'env_atm_log': self.environment_properties['ATM']['atm_logging'],
                       'env_srp_log': self.environment_properties['SRP']['srp_logging'],
                       'dis_mag_log': self.disturbance_properties['MAG']['mag_logging'],
                       'dis_gra_log': self.disturbance_properties['GRA']['gra_logging']}
+        return properties
+
+    def EphSim(self):
+        config = configparser.ConfigParser()
+        config.read("Data/ini/PlanetSelect.ini", encoding="utf8")
+        properties = {'inertial_frame': config['PLANET_SELECTION']['inertial_frame'],
+                      'aberration_correction': config['PLANET_SELECTION']['aberration_correction'],
+                      'center_object': config['PLANET_SELECTION']['center_object'],
+                      'num_of_selected_body': config['PLANET_SELECTION']['num_of_selected_body'],
+                      'wgs': self.spacecraft_properties['Orbit']['propagate']['wgs']}
         return properties
 
 
@@ -97,14 +110,24 @@ def SatSim():
               'spacecraft_name': spacecraft_name}
 
     file_components = config['COMPONENTS']['file_components']
+    section = 'SUBSYSTEMS'
     comset = {'path_com': file_components,
-              'gyro_flag': config['COMPONENTS']['gyro'],
-              'obc_flag': config['COMPONENTS']['obc'],
-              'power_flag': config['COMPONENTS']['power'],
-              'rw_flag': config['COMPONENTS']['rw'],
-              'thruster_flag': config['COMPONENTS']['thruster'],
-              'stt_flag': config['COMPONENTS']['stt'],
-              'ss_flag': config['COMPONENTS']['ss']}
+              'create_cdh': config[section]['create_cdh'] == 'True',
+              'cdh_setting': config[section]['cdh_setting'],
+              'create_odcs': config[section]['create_odcs'] == 'True',
+              'odcs_setting': config[section]['odcs_setting'],
+              'create_adcs': config[section]['create_adcs'] == 'True',
+              'adcs_setting': config[section]['adcs_setting'],
+              'create_power': config[section]['create_power'] == 'True',
+              'power_setting': config[section]['power_setting'],
+              'create_com': config[section]['create_com'] == 'True',
+              'com_setting': config[section]['com_setting'],
+              'create_str': config[section]['create_str'] == 'True',
+              'str_setting': config[section]['str_setting'],
+              'create_payload': config[section]['create_payload'] == 'True',
+              'payload_setting': config[section]['payload_setting'],
+              'create_tcs': config[section]['create_tcs'] == 'True',
+              'tcs_setting': config[section]['tcs_setting']}
 
     return satset, comset
 
@@ -165,15 +188,15 @@ def EnvSim():
 
     atm_calculation = config['ATMOSPHERE']['calculation']
     atm_logging = config['ATMOSPHERE']['logging']
-    mag_properties = {'mag_calculation': mag_calculation,
-                      'mag_logging': mag_logging,
+    mag_properties = {'mag_calculation': mag_calculation == 'True',
+                      'mag_logging': mag_logging == 'True',
                       'mag_rwdev': mag_rwdev,
                       'mag_rwlimit': mag_rwlimit,
                       'mag_wnvar': mag_wnvar}
-    srp_properties = {'srp_calculation': srp_calculation,
-                      'srp_logging': srp_logging}
-    atm_properties = {'atm_calculation': atm_calculation,
-                      'atm_logging': atm_logging}
+    srp_properties = {'srp_calculation': srp_calculation == 'True',
+                      'srp_logging': srp_logging == 'True'}
+    atm_properties = {'atm_calculation': atm_calculation == 'True',
+                      'atm_logging': atm_logging == 'True'}
     environment_properties = {'MAG': mag_properties,
                               'SRP': srp_properties,
                               'ATM': atm_properties}

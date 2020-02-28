@@ -12,9 +12,9 @@ class Environment(MagEnv):
 
         print('\nEnvironment properties')
         print('------------------------------')
-        print('Magnetic: ' + self.env_mag_flag)
-        print('Solar radiation: ' + self.env_srp_flag)
-        print('Atmosphere: ' + self.env_atm_flag)
+        print('Magnetic: ' + str(self.env_mag_flag))
+        print('Solar radiation: ' + str(self.env_srp_flag))
+        print('Atmosphere: ' + str(self.env_atm_flag))
         print('------------------------------')
 
     def update_environment(self, decyear, sideral, lat, lon, alt, q_i2b):

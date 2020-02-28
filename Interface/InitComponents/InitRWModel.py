@@ -27,7 +27,8 @@ class InitRWModel(object):
                                   'torque_transition': torque_transition,
                                   'firstorder_lag_const': config_com[rw_number]['firstorder_lag_const'],
                                   'dead_time': config_com[rw_number]['dead_time'],
-                                  'rw_number_id': rw_number}
+                                  'rw_number_id': rw_number,
+                                  'max_torque': config_com[rw_number]['max_torque']}
             self.rw_properties.append(rw_properties_id)
             print(' - RW ' + id_conifg + ' added')
 

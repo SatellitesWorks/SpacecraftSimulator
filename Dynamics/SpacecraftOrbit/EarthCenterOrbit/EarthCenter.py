@@ -14,7 +14,7 @@ Created on Thu Jan 16 05:54:44 2020
 
 from Library.sgp4.earth_gravity import wgs72, wgs72old, wgs84
 from Library.sgp4.io import twoline2rv
-from Library.math_sup.tools_reference_frame import fmod2
+
 
 import numpy as np
 
@@ -33,9 +33,6 @@ class EarthCenterOrbit(object):
         self.line2 = line2
         self.position_i = np.zeros(3)
         self.velocity_i = np.zeros(3)
-        self.current_lat = 0
-        self.current_long = 0
-        self.current_alt = 0
 
         if wgs == 0:
             self.wgs = wgs72old
@@ -54,7 +51,7 @@ class EarthCenterOrbit(object):
         self.satellite = twoline2rv(self.line1, self.line2, self.wgs)
         self.tolerance = 1e-10  # rad
 
-    def propagate_in_earth(self, string_time):
+    def get_Pos_Vel(self, string_time):
         position_i, velocity_i = self.satellite.propagate(string_time[0],  # YYYY
                                                           string_time[1],  # MM
                                                           string_time[2],  # DD
@@ -64,22 +61,3 @@ class EarthCenterOrbit(object):
         self.position_i = np.array(position_i) * 1000
         self.velocity_i = np.array(velocity_i) * 1000
         return self.position_i, self.velocity_i  # [m]
-
-    def TransECItoGeo(self, current_sideral):
-        r = np.sqrt(self.position_i[0] ** 2 + self.position_i[1] ** 2)
-
-        long = fmod2(np.arctan2(self.position_i[1], self.position_i[0]) - current_sideral)
-        lat = np.arctan2(self.position_i[2], r)
-
-        flag_iteration = True
-        while flag_iteration:
-            phi = lat
-            c = 1 / np.sqrt(1 - self.e2 * np.sin(phi) * np.sin(phi))
-            lat = np.arctan2(self.position_i[2] + self.radiusearthkm * c * self.e2 * np.sin(phi) * 1000, r)
-            if (np.abs(lat - phi)) <= self.tolerance:
-                flag_iteration = False
-
-        alt = r / np.cos(lat) - self.radiusearthkm * c * 1000  # *metros
-        if lat > np.pi / 2:
-            lat -= twopi
-        return lat, long, alt

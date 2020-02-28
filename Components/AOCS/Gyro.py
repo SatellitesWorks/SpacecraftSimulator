@@ -2,10 +2,15 @@
 import numpy as np
 from Library.math_sup.Quaternion import Quaternions
 from Library.math_sup.RandomWalk import RandomWalk
+from ..Abstract.ComponentBase import ComponentBase
+from Interface.SpacecraftInOut.SCIDriver import SCIDriver
 
 
-class Gyro(object):
-    def __init__(self, properties):
+class Gyro(ComponentBase):
+    def __init__(self, port_id, properties, dynamics):
+        ComponentBase.__init__(self, 10)
+        self.dynamics_in_gyro = dynamics
+        self.port_id = port_id
         self.current = properties['current']
         self.q_b2c = Quaternions(properties['q_b2c'])
         self.scalefactor = properties['ScaleFactor']
@@ -15,7 +20,12 @@ class Gyro(object):
         self.range_to_zero = properties['Range_to_zero']
         self.current_omega_c = np.zeros(3)
         self.historical_omega_c = []
-        print(' - Gyro added')
+        self.scidriver = SCIDriver()
+        self.scidriver.connect_port(self.port_id, 0, 0)
+
+    def main_routine(self, count):
+        self.measure(self.dynamics_in_gyro.attitude.current_omega_b)
+        return
 
     def measure(self, omega_b):
         self.RangeCheck()
@@ -62,10 +72,10 @@ class Gyro(object):
     def get_historical_omega_c(self):
         return self.historical_omega_c
 
-    def update(self, variables):
-        self.measure(variables['omega'])
-        self.historical_omega_c.append(self.current_omega_c)
-        return
-
     def get_current(self):
         return self.current
+
+    def log_value(self):
+        self.historical_omega_c.append(self.current_omega_c)
+
+
