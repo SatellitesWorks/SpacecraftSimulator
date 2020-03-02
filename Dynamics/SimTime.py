@@ -28,18 +28,21 @@ class SimTime(object):
                                         self.current_array[5])
         self.current_decyaer = JdToDecyear(self.current_jd)
         # Principal Time variable
-        self.stepsimTime    = time_properties['StepTime'] # principal Step
-        self.maincountTime  = 0 # Count for Principal Step
+        self.stepsimTime    = time_properties['StepTime']   # principal Step
+        self.maincountTime  = 0     # Count for Principal Step
         self.logperiod      = time_properties['LogPeriod']
-        self.log_count      = 0 # Log output Period in function of principal time
-        self.log_flag       = True # It is true to save the first data (initial)
+        self.log_count      = 0     # Log output Period in function of principal time
+        self.log_flag       = True  # It is true to save the first data (initial)
 
         # Auxiliary variable for orbit, attitude and thermal update
         self.orbitstep              = time_properties['OrbStepTime']  # Orbit Step
         self.attitudestep           = time_properties['PropStepSec']  # Attitude step
-        self.orbit_update_flag      = True # Flag for Orbit Step
+        self.orbit_update_flag      = True  # Flag for Orbit Step
         self.attitudecountTime      = 0  # Count for Attitude Step
         self.orbitcountTime         = 0  # Count for Orbit Step
+
+        self.historical_DateTime    = []
+        self.historical_satStepTime        = []
         print("-----------------------------")
         print('Simulation start Time: ' + start_string)
 
@@ -50,7 +53,7 @@ class SimTime(object):
                              datetime_array.day,
                              datetime_array.hour,
                              datetime_array.minute,
-                             datetime_array.second]# + datetime_array.microsecond/1e6]
+                             datetime_array.second + datetime_array.microsecond/1e6]
         return currenttime_array, datetime_array.strftime('%Y-%m-%d %H:%M:%S')
 
     def updateSimtime(self):
@@ -86,3 +89,12 @@ class SimTime(object):
         if self.log_count == self.logperiod:
             self.log_flag = True
             self.log_count = 0
+
+    def save_simtime_data(self):
+        self.historical_DateTime.append(self.get_array_time()[1])
+        self.historical_satStepTime.append(self.maincountTime)
+
+    def get_log_values(self):
+        report_timelog = {'Date time': self.historical_DateTime,
+                          'time[sec]': self.historical_satStepTime}
+        return report_timelog

@@ -26,6 +26,11 @@ class MainOrbit(object):
         self.current_lat            = 0
         self.current_long           = 0
         self.current_alt            = 0
+        self.historical_position_i  = []
+        self.historical_velocity_i  = []
+        self.historical_lats        = []
+        self.historical_longs       = []
+        self.historical_alts        = []
 
     def set_propagator(self):
         if self.propagation_properties['propagate_mode'] == 0:
@@ -66,3 +71,23 @@ class MainOrbit(object):
         self.current_lat = lat
         self.current_long = long
         return lat, long, alt
+
+    def save_orbit_data(self):
+        self.historical_position_i.append(self.current_position)
+        self.historical_velocity_i.append(self.current_velocity)
+        self.historical_lats.append(self.current_lat)
+        self.historical_longs.append(self.current_long)
+        self.historical_alts.append(self.current_alt)
+
+    def get_log_values(self):
+        report_orbit = {'sat_position_i(X)[m]': np.array(self.historical_position_i)[:, 0],
+                        'sat_position_i(Y)[m]': np.array(self.historical_position_i)[:, 1],
+                        'sat_position_i(Z)[m]': np.array(self.historical_position_i)[:, 2],
+                        'sat_velocity_i(X)[m/s]': np.array(self.historical_velocity_i)[:, 0],
+                        'sat_velocity_i(Y)[m/s]': np.array(self.historical_velocity_i)[:, 1],
+                        'sat_velocity_i(Z)[m/s]': np.array(self.historical_velocity_i)[:, 2],
+                        'lat[rad]': np.array(self.historical_lats),
+                        'lon[rad]': np.array(self.historical_longs),
+                        'alt[m]': np.array(self.historical_alts)}
+        return report_orbit
+

@@ -1,6 +1,7 @@
 
 from Interface.InitComponents.InitSubSystems import InitSubSystems
-from .Components import Components
+from Components.Abstract.ADCS import ADCS
+from Components.Abstract.ODCS import ODCS
 import numpy as np
 
 
@@ -8,21 +9,33 @@ class SubSystems(InitSubSystems):
     def __init__(self, components_properties, dynamics):
         InitSubSystems.__init__(self, components_properties)
 
-        self.components = {}
-        number_i = 1
-        for sub_elem in self.system_name:
-            self.components[sub_elem] = Components(self.init_components[sub_elem], dynamics, number_i)
-            number_i += 1
+        cdh = None
+        adcs = ADCS(self.init_components['ADCS'], dynamics)
+        odcs = ODCS(self.init_components['ODCS'], dynamics)
+        power = None
+        com = None
+        str = None
+        payload = None
+        tcs = None
+
+        self.subsystems = {'CDH': cdh,
+                           'ADCS': adcs,
+                           'ODCS': odcs,
+                           'POWER': power,
+                           'COM': com,
+                           'STR': str,
+                           'PAYLOAD': payload,
+                           'TCS': tcs}
 
     def generate_torque_b(self):
-        torque_b = np.zeros(3)
-        if self.components['ADCS'].rwmodel is not None:
-            for rw in self.components['ADCS'].rwmodel:
-                torque_b += rw.get_torque()
-        return torque_b
+        return self.subsystems['ADCS'].get_torque() + self.subsystems['ODCS'].get_torque()
 
-    def update(self):
+    def generate_force_b(self):
+        return self.subsystems['ODCS'].get_force()
+
+    def save_log_values(self):
         for sub_elem in self.system_name:
-            for comp in self.components[sub_elem].components_list:
-                if comp is not None:
-                    comp.log_value()
+            if self.subsystems[sub_elem] is not None:
+                for comp in self.subsystems[sub_elem].components.get_list:
+                    if comp is not None:
+                        comp.log_value()

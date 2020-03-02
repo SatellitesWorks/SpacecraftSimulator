@@ -87,7 +87,7 @@ class MainSimulation(InitialConfig, Logger):
             self.simtime.updateSimtime()
 
         # Data report to create dictionary
-        self.spacecraft.create_data()
+        self.spacecraft.create_report()
         self.ephemeris.earth.create_report()
 
         # Save Dataframe pandas in csv file

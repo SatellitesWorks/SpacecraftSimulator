@@ -26,16 +26,20 @@ class Attitude(object):
 
         self.current_h_rw_b     = np.zeros(3)
         self.int_torque_b       = np.zeros(3)
+        self.ext_torque_b       = np.zeros(3)
         self.h_total_b          = np.zeros(3)
-        self.h_total_norm       = 0
+        self.h_total_i_norm     = 0
         self.new_omega_b        = np.zeros(3)
         self.new_quaternion_i2b = np.zeros(3)
         self.h_total_i          = np.zeros(3)
         self.int_force_b        = np.zeros(3)
-        self.ext_torque_b       = np.zeros(3)
         self.ext_force_b        = np.zeros(3)
         self.S_omega            = np.zeros((3, 3))
         self.Omega              = np.zeros((4, 4))
+        self.historical_quaternion_i2b = []
+        self.historical_omega_b = []
+        self.historical_torque_t_b   = []
+        self.historical_h_total_i = []
 
     def update_attitude(self, current_simtime):
         if self.attitude_update_flag:
@@ -49,6 +53,12 @@ class Attitude(object):
 
         self.calangmom()
         self.reset_var_b()
+
+    def save_attitude_data(self):
+        self.historical_quaternion_i2b.append(self.current_quaternion_i2b())
+        self.historical_omega_b.append(self.current_omega_b)
+        self.historical_torque_t_b.append(self.total_torque_b())
+        self.historical_h_total_i.append(self.h_total_i_norm)
 
     def add_ext_torque_b(self, ext_torque_b):
         self.ext_torque_b += ext_torque_b
@@ -114,7 +124,7 @@ class Attitude(object):
         self.h_total_b = self.current_h_rw_b + h_spacecraft_b
         q_bi2 = Quaternions(self.current_quaternion_i2b.conjugate())
         self.h_total_i = q_bi2.frame_conv(self.h_total_b)
-        self.h_total_norm = np.linalg.norm(self.h_total_i)
+        self.h_total_i_norm = np.linalg.norm(self.h_total_i)
 
     def skewsymmetricmatrix(self, x_omega_b):
 
@@ -145,3 +155,17 @@ class Attitude(object):
 
         self.Omega[3, 1] = -x_omega_b[1]
         self.Omega[3, 2] = -x_omega_b[2]
+
+    def get_log_values(self):
+        report_attitude = {'omega_t_b(X)[rad/s]': np.array(self.historical_omega_b)[:, 0],
+                           'omega_t_b(Y)[rad/s]': np.array(self.historical_omega_b)[:, 1],
+                           'omega_t_b(Z)[rad/s]': np.array(self.historical_omega_b)[:, 2],
+                           'q_t_i2b(0)[-]': np.array(self.historical_quaternion_i2b)[:, 0],
+                           'q_t_i2b(1)[-]': np.array(self.historical_quaternion_i2b)[:, 1],
+                           'q_t_i2b(2)[-]': np.array(self.historical_quaternion_i2b)[:, 2],
+                           'q_t_i2b(3)[-]': np.array(self.historical_quaternion_i2b)[:, 3],
+                           'torque_t_b(X)[Nm]': np.array(self.historical_torque_t_b)[:, 0],
+                           'torque_t_b(Y)[Nm]': np.array(self.historical_torque_t_b)[:, 1],
+                           'torque_t_b(Z)[Nm]': np.array(self.historical_torque_t_b)[:, 2],
+                           'h_total[Nms]': np.array(self.historical_h_total_i)}
+        return report_attitude
