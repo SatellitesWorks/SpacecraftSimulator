@@ -16,8 +16,11 @@ class Ephemeris(object):
 
         self.earth = Earth(ephemerides_properties['wgs'])
 
-    def Earth(self):
-        self.Earth()
+    def update(self, current_jd):
+        self.earth.calc_gst(current_jd)
+
+    def save_ephemeris_data(self):
+        self.earth.save_earth_data()
 
 
 

@@ -6,21 +6,26 @@ from .MagDist import Magnetic
 from .SRP import SRP
 
 
-class Disturbances(Magnetic, GravGrad):
-    def __init__(self, disturbance_properties):
-        Magnetic.__init__(self, disturbance_properties['MAG'])
-        GravGrad.__init__(self, disturbance_properties['GRA'])
+class Disturbances(object):
+    def __init__(self, disturbance_properties, environment, spacecraft):
+        mag = Magnetic(disturbance_properties['MAG'])
+        grav = GravGrad(disturbance_properties['GRA'])
+        self.dist_environment = environment
+        self.dist_spacecraft = spacecraft
+
+        self.disturbance_ = [mag,
+                             grav]
 
         self.dist_torque_b = np.zeros(3)
         self.dist_force_b  = np.zeros(3)
 
-    def update_disturbances(self, Mag_b):
-        self.update_output()
+    def update(self):
+        self.reset_output()
 
-        if self.dist_mag_flag:
-            self.dist_torque_b += self.get_mag_torque_b(Mag_b)
-        elif self.dist_gra_flag:
-            self.dist_torque_b += self.get_grav_torque_b()
+        for dist in self.disturbance_:
+            if dist.dist_flag:
+                dist.update(self.dist_environment, self.dist_spacecraft)
+                self.dist_torque_b += dist.get_torque_b()
 
     def get_dist_torque(self):
         return self.dist_torque_b
@@ -28,6 +33,6 @@ class Disturbances(Magnetic, GravGrad):
     def get_dis_force(self):
         return self.dist_force_b
 
-    def update_output(self):
+    def reset_output(self):
         self.dist_torque_b = np.zeros(3)
         self.dist_force_b  = np.zeros(3)

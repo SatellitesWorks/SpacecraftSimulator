@@ -68,6 +68,7 @@ class SimTime(object):
                                         self.current_array[5])
         self.current_decyaer = JdToDecyear(self.current_jd)
         self.orbitcountTime     += self.stepsimTime
+
         if abs(self.orbitcountTime - self.orbitstep) < 1e-6:
             self.orbit_update_flag = True
             self.orbitcountTime = 0

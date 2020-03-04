@@ -4,7 +4,7 @@ import configparser
 
 
 class InitSubSystems(object):
-    def __init__(self, properties):
+    def __init__(self, properties,  prop_step):
         self.system_name = ['CDH', 'ADCS', 'ODCS', 'POWER', 'COM', 'STR', 'PAYLOAD', 'TCS']
         self.file_components = properties['path_com']
 
@@ -15,7 +15,7 @@ class InitSubSystems(object):
         for sub_elem in self.system_name:
             print("-----------------------------")
             print('SubSystem: ', sub_elem)
-            self.init_components[sub_elem] = InitComponents(self.system_init[sub_elem])
+            self.init_components[sub_elem] = InitComponents(self.system_init[sub_elem],  prop_step)
 
     def rewrite_init(self, properties):
         for subsys in self.system_name:

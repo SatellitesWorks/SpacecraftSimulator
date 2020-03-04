@@ -7,15 +7,34 @@ import numpy as np
 
 class Quaternions(object):
     def __init__(self, quaterion_ini):
-        self.q = np.array(quaterion_ini)
+        q_ = np.array([0.0, 0.0, 0.0, 1.0])
+        if len(quaterion_ini) == 4:
+            q_ = np.array(quaterion_ini)
+        elif len(quaterion_ini) == 2:
+            rot = quaterion_ini[1]
+            print(quaterion_ini[0])
+            rot *= 0.5
+            q_[3] = np.cos(rot)
+            print(q_)
+            q_[0:3] = quaterion_ini[0]*np.sin(rot)
+            print(q_)
+        self.q = q_
 
     def __call__(self, *args, **kwargs):
         return self.q
 
     def setquaternion(self, setvalue):
-        self.q = setvalue
+        q_ = np.array([0.0, 0.0, 0.0, 1.0])
+        if len(setvalue) == 4:
+            q_ = np.array(setvalue)
+        elif len(setvalue) == 2:
+            rot = setvalue[1]
+            rot *= 0.5
+            q_[3] = np.cos(rot)
+            q_[0:3] = setvalue[0] * np.sin(rot)
+        self.q = q_
 
-    def normalizeq(self):
+    def normalize(self):
         div = np.linalg.norm(self.q)
         self.q = self.q / div
 

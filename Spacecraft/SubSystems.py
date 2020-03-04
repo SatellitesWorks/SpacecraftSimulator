@@ -6,8 +6,8 @@ import numpy as np
 
 
 class SubSystems(InitSubSystems):
-    def __init__(self, components_properties, dynamics):
-        InitSubSystems.__init__(self, components_properties)
+    def __init__(self, components_properties, dynamics, prop_step):
+        InitSubSystems.__init__(self, components_properties,  prop_step)
 
         cdh = None
         adcs = ADCS(self.init_components['ADCS'], dynamics)

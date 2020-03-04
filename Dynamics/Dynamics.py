@@ -1,6 +1,7 @@
 
 from .SpacecraftOrbit.MainOrbit import MainOrbit
 from .SpacecraftAttitude.Attitude import Attitude
+from .CelestialBody.Ephemeris import Ephemeris
 
 
 class Dynamics(object):
@@ -12,10 +13,14 @@ class Dynamics(object):
                                 'attitudestep': self.simtime.attitudestep}
         orbit_properties = {'Orbit_info': dynamics_properties['Orbit']['Orbit_info'],
                             'propagate': dynamics_properties['Orbit']['propagate']}
-        self.attitude = Attitude(attitude_properties)
-        self.orbit = MainOrbit(orbit_properties)
+        self.attitude  = Attitude(attitude_properties)
+        self.orbit     = MainOrbit(orbit_properties)
+        self.ephemeris = Ephemeris(dynamics_properties['Ephemerides'])
 
     def update(self):
-        self.orbit.update_orbit(self.simtime.get_array_time()[0])
         self.attitude.update_attitude(self.simtime.maincountTime)
-        return
+        if self.simtime.orbit_update_flag:
+            self.orbit.update_orbit(self.simtime.get_array_time()[0])
+            self.ephemeris.update(self.simtime.current_jd)
+            self.orbit.TransECItoGeo(self.ephemeris.earth.get_current_sideral())
+            self.simtime.orbit_update_flag = False

@@ -46,8 +46,8 @@ class Gyro(ComponentBase):
         #omega_c += self.nrs_c
 
         self.current_omega_c = omega_c
-
         self.clip()
+        return self.current_omega_c
 
     def RangeCheck(self):
         if self.range_to_const < 0.0 or self.range_to_zero < 0.0:

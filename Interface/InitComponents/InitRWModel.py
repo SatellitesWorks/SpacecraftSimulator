@@ -4,7 +4,7 @@ import numpy as np
 
 
 class InitRWModel(object):
-    def __init__(self, path_com):
+    def __init__(self, path_com, prop_step):
         config_com = configparser.ConfigParser()
         directory = path_com + 'RW.ini'
         config_com.read(directory, encoding="utf8")
@@ -28,7 +28,8 @@ class InitRWModel(object):
                                   'firstorder_lag_const': config_com[rw_number]['firstorder_lag_const'],
                                   'dead_time': config_com[rw_number]['dead_time'],
                                   'rw_number_id': rw_number,
-                                  'max_torque': config_com[rw_number]['max_torque']}
+                                  'max_torque': config_com[rw_number]['max_torque'],
+                                  'prop_step': prop_step}
             self.rw_properties.append(rw_properties_id)
             print(' - RW ' + id_conifg + ' added')
 

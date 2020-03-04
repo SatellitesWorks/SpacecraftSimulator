@@ -15,12 +15,13 @@ class InitialConfig(object):
         self.time_properties = TimeSim()
         spacecraft_properties, self.components_properties = SatSim()
         orbit_properties = OrbitSim()
-        self.spacecraft_properties ={'Attitude': spacecraft_properties,
-                                     'Orbit': orbit_properties}
         self.environment_properties = EnvSim()
         self.disturbance_properties = DistSim()
+        self.spacecraft_properties = {'Attitude': spacecraft_properties,
+                                      'Orbit': orbit_properties}
+        ephemeris_properties = {'Ephemerides': self.EphSim()}
+        self.spacecraft_properties = {**self.spacecraft_properties, **ephemeris_properties}
         self.logger_properties = self.LogSim()
-        self.ephemeris_properties = self.EphSim()
 
     def LogSim(self):
         properties = {'orb_log': self.spacecraft_properties['Orbit']['logging'],

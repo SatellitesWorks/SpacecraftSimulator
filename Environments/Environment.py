@@ -17,7 +17,12 @@ class Environment(MagEnv):
         print('Atmosphere: ' + str(self.env_atm_flag))
         print('------------------------------')
 
-    def update_environment(self, decyear, sideral, lat, lon, alt, q_i2b):
+    def update(self, decyear, dynamics):
+        sideral  = dynamics.ephemeris.earth.current_sideral
+        lat = dynamics.orbit.current_lat
+        lon = dynamics.orbit.current_long
+        alt = dynamics.orbit.current_alt
+        q_i2b = dynamics.attitude.current_quaternion_i2b
         if self.env_mag_flag:
             self.calc_mag(decyear, sideral, lat, lon, alt, q_i2b)
 

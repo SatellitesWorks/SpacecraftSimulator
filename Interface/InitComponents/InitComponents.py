@@ -4,7 +4,7 @@ from .InitRWModel import InitRWModel
 
 
 class InitComponents(object):
-    def __init__(self, properties):
+    def __init__(self, properties,  prop_step):
 
         init_gyro = None
         init_obc = None
@@ -44,7 +44,7 @@ class InitComponents(object):
         if properties['power_flag']:
             k = 0
         if properties['rw_flag']:
-            self.rw_properties = InitRWModel(path).rw_properties
+            self.rw_properties = InitRWModel(path,  prop_step).rw_properties
         if properties['thruster_flag']:
             k = 0
         if properties['stt_flag']:

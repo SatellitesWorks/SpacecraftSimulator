@@ -75,6 +75,9 @@ class Attitude(object):
     def add_int_force_b(self, force_b):
         self.int_force_b += force_b
 
+    def get_current_q_i2b(self):
+        return self.current_quaternion_i2b()
+
     def total_torque_b(self):
         return self.ext_torque_b + self.int_torque_b
 
@@ -117,7 +120,7 @@ class Attitude(object):
 
         self.current_omega_b = next_x[0:3]
         self.current_quaternion_i2b.setquaternion(next_x[3:])
-        self.current_quaternion_i2b.normalizeq()
+        self.current_quaternion_i2b.normalize()
 
     def calangmom(self):
         h_spacecraft_b = self.Inertia.dot(self.current_omega_b)

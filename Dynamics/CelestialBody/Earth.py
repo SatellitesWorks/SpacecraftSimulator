@@ -1,6 +1,5 @@
 
 import numpy as np
-from Library.sgp4.earth_gravity import wgs72, wgs72old, wgs84
 from Library.math_sup.tools_reference_frame import gstime
 twopi       = 2.0 * np.pi
 deg2rad     = np.pi / 180.0
@@ -11,7 +10,7 @@ class Earth(object):
         self.historical_gst = []
         self.h_gst = {}
         self.current_sideral = 0
-        self.radiusearthkm = 6378.315 #km
+        self.radiusearthkm = 6378.315   # km
         if wgs == 0:
             self.radiusearthkm = 6378.135  # km
         elif wgs == 1:
@@ -21,14 +20,15 @@ class Earth(object):
         else:
             print('wgs not used')
 
-    def gst_Update(self):
+    def save_earth_data(self):
         self.historical_gst.append(self.current_sideral)
 
-    def getSideral(self, current_jd):
+    def calc_gst(self, current_jd):
         self.current_sideral = gstime(current_jd)
 
-    def create_report(self):
-        self.h_gst = {'GST [rad]': self.historical_gst}
+    def get_current_sideral(self):
+        return self.current_sideral
 
-
-
+    def get_log_values(self):
+        h_gst = {'GST [rad]': self.historical_gst}
+        return h_gst
