@@ -25,7 +25,9 @@ class Gyro(ComponentBase):
 
     def main_routine(self, count):
         self.measure(self.dynamics_in_gyro.attitude.current_omega_b)
-        return
+
+    def set_port_id(self, port):
+        self.port_id = port
 
     def measure(self, omega_b):
         self.RangeCheck()
@@ -54,7 +56,6 @@ class Gyro(ComponentBase):
             print("Gyro: range should be positive!!")
         elif self.range_to_const > self.range_to_zero:
             print("Gyro: range2 should be greater than range1!!")
-        return
 
     def clip(self):
         for i in range(self.current_omega_c.size):
@@ -64,18 +65,18 @@ class Gyro(ComponentBase):
                 self.current_omega_c[i] = -self.range_to_const
             elif np.abs(self.current_omega_c[i]) >= self.range_to_zero:
                 self.current_omega_c[i] = 0.0
-        return
 
     def get_omega_c(self):
         return self.current_omega_c
 
-    def get_historical_omega_c(self):
-        return self.historical_omega_c
+    def get_log_values(self, subsys):
+        report = {'gyro_omega' + subsys + '_c(X)[rad/s]': np.array(self.historical_omega_c)[:, 0],
+                  'gyro_omega' + subsys + '_c(Y)[rad/s]': np.array(self.historical_omega_c)[:, 1],
+                  'gyro_omega' + subsys + '_c(Z)[rad/s]': np.array(self.historical_omega_c)[:, 2]}
+        return report
 
     def get_current(self):
         return self.current
 
     def log_value(self):
         self.historical_omega_c.append(self.current_omega_c)
-
-

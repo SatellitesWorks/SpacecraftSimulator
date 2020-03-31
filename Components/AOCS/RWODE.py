@@ -13,7 +13,7 @@ class RWODE(object):
         return self.current_ang_velocity
 
     def dynamics_rw(self, state, t):
-        rhs_ = (self.target_angular_velocity - state)/self.lag_coef
+        rhs_ = (self.target_angular_velocity - state) / self.lag_coef
         return rhs_
 
     def update_ode(self):

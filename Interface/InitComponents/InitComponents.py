@@ -8,7 +8,7 @@ class InitComponents(object):
 
         init_gyro = None
         init_obc = None
-        init_power= None
+        init_power = None
         init_rw = None
         init_thruster = None
         init_stt = None
@@ -26,7 +26,7 @@ class InitComponents(object):
         self.obc_properties     = None
         self.rw_properties      = None
         self.power_properties   = None
-        self.thruster_properties= None
+        self.thruster_properties = None
         self.stt_properties     = None
         self.ss_properties      = None
         self.gps_properties     = None

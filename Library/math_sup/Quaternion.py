@@ -1,6 +1,5 @@
-
-
 import numpy as np
+
 
 # quaternion = [i, j, k, 1]
 
@@ -16,12 +15,22 @@ class Quaternions(object):
             rot *= 0.5
             q_[3] = np.cos(rot)
             print(q_)
-            q_[0:3] = quaterion_ini[0]*np.sin(rot)
+            q_[0:3] = quaterion_ini[0] * np.sin(rot)
             print(q_)
         self.q = q_
 
     def __call__(self, *args, **kwargs):
         return self.q
+
+    def __mul__(self, r_quat):
+        temp = np.zeros(4)
+        left_quat = self.q
+        right_quat = r_quat.q
+        temp[0] = left_quat[3] * right_quat[0] - left_quat[2] * right_quat[1] + left_quat[1] * right_quat[2] + left_quat[0] * right_quat[3]
+        temp[1] = left_quat[2] * right_quat[0] + left_quat[3] * right_quat[1] - left_quat[0] * right_quat[2] + left_quat[1] * right_quat[3]
+        temp[2] = -left_quat[1] * right_quat[0] + left_quat[0] * right_quat[1] + left_quat[3] * right_quat[2] +left_quat[2] * right_quat[3]
+        temp[3] = -left_quat[0] * right_quat[0] - left_quat[1] * right_quat[1] - left_quat[2] * right_quat[2] +left_quat[3] * right_quat[3]
+        return Quaternions(temp)
 
     def setquaternion(self, setvalue):
         q_ = np.array([0.0, 0.0, 0.0, 1.0])
@@ -58,7 +67,7 @@ class Quaternions(object):
         dcm = [[q1 ** 2 - q2 ** 2 - q3 ** 2 + q4 ** 2, 2 * (q1 * q2 + q3 * q4), 2 * (q1 * q3 - q2 * q4)],
                [2 * (q1 * q2 - q3 * q4), -q1 ** 2 + q2 ** 2 - q3 ** 2 + q4 ** 2, 2 * (q2 * q3 + q1 * q4)],
                [2 * (q1 * q3 + q2 * q4), 2 * (q2 * q3 - q1 * q4), -q1 ** 2 - q2 ** 2 + q3 ** 2 + q4 ** 2]]
-        return  np.array(dcm)
+        return np.array(dcm)
 
     def toeuler(self):
         """

@@ -1,10 +1,8 @@
 
-from Dynamics.ClockGenerator import ClockGenerator
-
 
 class ComponentBase(object):
-    def __init__(self, prescalar):
-        self.prescalar = prescalar
+    def __init__(self, prescalar_time):
+        self.prescalar = prescalar_time
         self.isOn = True
 
     def set_power_state(self, port_id, voltage):

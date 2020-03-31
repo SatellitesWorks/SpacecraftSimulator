@@ -61,19 +61,19 @@ class Attitude(object):
         self.historical_h_total_i.append(self.h_total_i_norm)
 
     def add_ext_torque_b(self, ext_torque_b):
-        self.ext_torque_b += ext_torque_b
+        self.ext_torque_b = ext_torque_b
 
     def add_ext_force_b(self, ext_force_b):
-        self.ext_force_b += ext_force_b
+        self.ext_force_b = ext_force_b
 
     def get_ext_force_b(self):
         return self.ext_force_b
 
     def add_int_torque_b(self, torque_b):
-        self.int_torque_b += torque_b
+        self.int_torque_b = torque_b
 
     def add_int_force_b(self, force_b):
-        self.int_force_b += force_b
+        self.int_force_b = force_b
 
     def get_current_q_i2b(self):
         return self.current_quaternion_i2b()
@@ -96,8 +96,7 @@ class Attitude(object):
 
         h_total_b = self.current_h_rw_b + self.Inertia.dot(x_omega_b)
 
-        w_dot = -self.inv_Inertia.dot(self.S_omega.dot(h_total_b)
-                                      - self.total_torque_b())
+        w_dot = -self.inv_Inertia.dot(self.S_omega.dot(h_total_b) - self.total_torque_b())
 
         q_dot = 0.5*self.Omega.dot(x_quaternion_i2b)
         f_x = np.concatenate((w_dot, q_dot))

@@ -50,3 +50,12 @@ class ODCS(ComponentBase):
 
     def get_torque(self):
         return self.torque_thruster_b
+
+    def get_log_values(self, subsys):
+        report = {}
+        if hasattr(self.components, 'gyro'):
+            gyro = self.components.gyro
+            report['gyro_omega_' + subsys + '_c(X)[rad/s]'] = np.array(gyro.historical_omega_c)[:, 0]
+            report['gyro_omega_' + subsys + '_c(Y)[rad/s]'] = np.array(gyro.historical_omega_c)[:, 1]
+            report['gyro_omega_' + subsys + '_c(Z)[rad/s]'] = np.array(gyro.historical_omega_c)[:, 2]
+        return report

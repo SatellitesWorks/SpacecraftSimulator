@@ -76,7 +76,7 @@ class SimTime(object):
         self.update_log_count()
 
     def progressionsimTime(self):
-        val = round(100*self.maincountTime/self.endsimTime, 2)
+        val = round(100*self.maincountTime/self.endsimTime, 3)
         if val % 5 == 0:
             print(val, '%')
 

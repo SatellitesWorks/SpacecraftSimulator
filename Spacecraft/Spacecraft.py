@@ -28,10 +28,8 @@ class Spacecraft(SubSystems):
         self.dynamics.update()
 
         # Tick the time on component
-        i = 0
-        while i < self.simtime.stepsimTime*100:
+        for i_ in range(int(self.simtime.stepsimTime*1000)):
             self.clockgenerator.tick_to_components()
-            i += 1
         return
 
     def update_data(self):
@@ -41,27 +39,22 @@ class Spacecraft(SubSystems):
         self.dynamics.orbit.save_orbit_data()
         self.dynamics.ephemeris.save_ephemeris_data()
         self.simtime.save_simtime_data()
+        self.subsystems['ADCS'].save_data()
 
     def create_report(self):
         report_attitude = self.dynamics.attitude.get_log_values()
         report_orbit = self.dynamics.orbit.get_log_values()
         report_ephemerides = self.dynamics.ephemeris.earth.get_log_values()
         report_timelog = self.simtime.get_log_values()
+        report_subsystems = {}
 
-        report_sensor = {}
-
-        i = 1
         for subsys in self.system_name:
             if self.subsystems[subsys] is not None:
-                if hasattr(self.subsystems[subsys].components, 'gyro'):
-                    gyro = self.subsystems[subsys].components.gyro
-                    report_sensor['gyro_omega' + str(i) + '_c(X)[rad/s]'] = np.array(gyro.historical_omega_c)[:, 0]
-                    report_sensor['gyro_omega' + str(i) + '_c(Y)[rad/s]'] = np.array(gyro.historical_omega_c)[:, 1]
-                    report_sensor['gyro_omega' + str(i) + '_c(Z)[rad/s]'] = np.array(gyro.historical_omega_c)[:, 2]
-                    i += 1
+                report_subsystems = {**report_subsystems,
+                                     **self.subsystems[subsys].get_log_values(subsys)}
 
         self.master_data_satellite = {**report_timelog,
                                       **report_attitude,
                                       **report_orbit,
-                                      **report_sensor,
+                                      **report_subsystems,
                                       **report_ephemerides}
