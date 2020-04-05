@@ -6,8 +6,9 @@ Created on Fri Jan 17 03:00:38 2020
 """
 
 import numpy as np
-from .EarthCenterOrbit.EarthCenter import EarthCenterOrbit
+from .EarthCenter import EarthCenterOrbit
 from Library.math_sup.tools_reference_frame import fmod2
+from .TwoBodyProblem import TwoBodyProblem
 
 twopi = 2.0 * np.pi
 deg2rad = np.pi / 180.0
@@ -15,8 +16,9 @@ rad2deg = 1 / deg2rad
 
 
 class MainOrbit(object):
-    def __init__(self, orbit_spacecraft):
-
+    def __init__(self, orbit_spacecraft, step_width, selected_planet):
+        self.step_width             = step_width
+        self.selected_planet        = selected_planet
         self.orbit_properties       = orbit_spacecraft['Orbit_info']
         self.propagation_properties = orbit_spacecraft['propagate']
         self.current_position       = np.zeros(3)
@@ -34,7 +36,10 @@ class MainOrbit(object):
 
     def set_propagator(self):
         if self.propagation_properties['propagate_mode'] == 0:
-            print('0')
+            self.propagator_model = TwoBodyProblem(self.selected_planet.mu,
+                                                   self.step_width,
+                                                   self.current_position,
+                                                   self.current_velocity)
         elif self.propagation_properties['propagate_mode'] == 1:
             line1      = self.orbit_properties[0]
             line2      = self.orbit_properties[1]
@@ -46,7 +51,7 @@ class MainOrbit(object):
             print('3')
 
     def update_orbit(self, array_time):
-        self.current_position, self.current_velocity = self.propagator_model.get_Pos_Vel(array_time)
+        self.current_position, self.current_velocity = self.propagator_model.update_state(array_time)
 
     def TransECItoGeo(self, current_sideral):
         r = np.sqrt(self.current_position[0] ** 2 + self.current_position[1] ** 2)

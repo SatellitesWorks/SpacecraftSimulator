@@ -14,8 +14,8 @@ class Dynamics(object):
         orbit_properties = {'Orbit_info': dynamics_properties['Orbit']['Orbit_info'],
                             'propagate': dynamics_properties['Orbit']['propagate']}
         self.attitude  = Attitude(attitude_properties)
-        self.orbit     = MainOrbit(orbit_properties)
         self.ephemeris = Ephemeris(dynamics_properties['Ephemerides'])
+        self.orbit     = MainOrbit(orbit_properties, self.simtime.orbitstep, self.ephemeris)
 
     def update(self):
         self.attitude.update_attitude(self.simtime.maincountTime)

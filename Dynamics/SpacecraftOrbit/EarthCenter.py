@@ -51,7 +51,7 @@ class EarthCenterOrbit(object):
         self.satellite = twoline2rv(self.line1, self.line2, self.wgs)
         self.tolerance = 1e-10  # rad
 
-    def get_Pos_Vel(self, string_time):
+    def update_state(self, string_time):
         position_i, velocity_i = self.satellite.propagate(string_time[0],  # YYYY
                                                           string_time[1],  # MM
                                                           string_time[2],  # DD
