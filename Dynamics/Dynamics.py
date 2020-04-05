@@ -15,12 +15,12 @@ class Dynamics(object):
                             'propagate': dynamics_properties['Orbit']['propagate']}
         self.attitude  = Attitude(attitude_properties)
         self.ephemeris = Ephemeris(dynamics_properties['Ephemerides'])
-        self.orbit     = MainOrbit(orbit_properties, self.simtime.orbitstep, self.ephemeris)
+        self.orbit     = MainOrbit(orbit_properties, self.simtime.orbitstep, self.ephemeris.selected_center_object)
 
     def update(self):
         self.attitude.update_attitude(self.simtime.maincountTime)
         if self.simtime.orbit_update_flag:
             self.orbit.update_orbit(self.simtime.get_array_time()[0])
             self.ephemeris.update(self.simtime.current_jd)
-            self.orbit.TransECItoGeo(self.ephemeris.earth.get_current_sideral())
+            self.orbit.TransECItoGeo(self.ephemeris.selected_center_object.get_current_sideral())
             self.simtime.orbit_update_flag = False

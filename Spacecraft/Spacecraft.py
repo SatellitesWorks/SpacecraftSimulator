@@ -44,7 +44,7 @@ class Spacecraft(SubSystems):
     def create_report(self):
         report_attitude = self.dynamics.attitude.get_log_values()
         report_orbit = self.dynamics.orbit.get_log_values()
-        report_ephemerides = self.dynamics.ephemeris.earth.get_log_values()
+        report_ephemerides = self.dynamics.ephemeris.selected_center_object.get_log_values()
         report_timelog = self.simtime.get_log_values()
         report_subsystems = {}
 

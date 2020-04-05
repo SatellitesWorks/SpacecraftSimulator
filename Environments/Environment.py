@@ -18,7 +18,7 @@ class Environment(MagEnv):
         print('------------------------------')
 
     def update(self, decyear, dynamics):
-        sideral  = dynamics.ephemeris.earth.current_sideral
+        sideral  = dynamics.ephemeris.selected_center_object.current_sideral
         lat = dynamics.orbit.current_lat
         lon = dynamics.orbit.current_long
         alt = dynamics.orbit.current_alt
