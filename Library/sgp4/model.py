@@ -41,10 +41,11 @@ class Satellite(object):
         Mean motion in radians per minute.
 
     """
-    def propagate(self, year, month=1, day=1, hour=0, minute=0, second=0.0):
+    def propagate(self, j=0, year=2000, month=1, day=1, hour=0, minute=0, second=0.0):
         """Return a position and velocity vector for a given date and time."""
 
-        j = jday(year, month, day, hour, minute, second)
+        if j == 0:
+            j = jday(year, month, day, hour, minute, second)
         m = (j - self.jdsatepoch) * minutes_per_day
         r, v = sgp4(self, m)
         return r, v

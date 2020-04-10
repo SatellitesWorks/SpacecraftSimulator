@@ -51,13 +51,8 @@ class EarthCenterOrbit(object):
         self.satellite = twoline2rv(self.line1, self.line2, self.wgs)
         self.tolerance = 1e-10  # rad
 
-    def update_state(self, string_time):
-        position_i, velocity_i = self.satellite.propagate(string_time[0],  # YYYY
-                                                          string_time[1],  # MM
-                                                          string_time[2],  # DD
-                                                          string_time[3],  # HH
-                                                          string_time[4],  # MM
-                                                          string_time[5])  # SS
+    def update_state(self, current_jd):
+        position_i, velocity_i = self.satellite.propagate(j=current_jd)
         self.position_i = np.array(position_i) * 1000
         self.velocity_i = np.array(velocity_i) * 1000
         return self.position_i, self.velocity_i  # [m]

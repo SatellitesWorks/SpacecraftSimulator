@@ -60,6 +60,9 @@ class Attitude(object):
         self.historical_torque_t_b.append(self.total_torque_b())
         self.historical_h_total_i.append(self.h_total_i_norm)
 
+    def get_class_q_i2b(self):
+        return self.current_quaternion_i2b
+
     def add_ext_torque_b(self, ext_torque_b):
         self.ext_torque_b = ext_torque_b
 

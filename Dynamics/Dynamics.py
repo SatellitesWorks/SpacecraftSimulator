@@ -20,7 +20,7 @@ class Dynamics(object):
     def update(self):
         self.attitude.update_attitude(self.simtime.maincountTime)
         if self.simtime.orbit_update_flag:
-            self.orbit.update_orbit(self.simtime.get_array_time()[0])
+            self.orbit.update_orbit(self.simtime.current_jd)
             self.ephemeris.update(self.simtime.current_jd)
             self.orbit.TransECItoGeo(self.ephemeris.selected_center_object.get_current_sideral())
-            self.simtime.orbit_update_flag = False
+        self.orbit.update_attitte(self.attitude.get_class_q_i2b())

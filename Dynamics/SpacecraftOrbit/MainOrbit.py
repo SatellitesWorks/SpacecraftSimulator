@@ -25,6 +25,7 @@ class MainOrbit(object):
         self.current_velocity       = np.zeros(3)
         self.propagator_model       = None
         self.wgs                    = self.propagation_properties['wgs']
+        self.current_velocity_b     = np.zeros(3)
         self.current_lat            = 0
         self.current_long           = 0
         self.current_alt            = 0
@@ -50,8 +51,14 @@ class MainOrbit(object):
         elif self.propagation_properties['propagate_mode'] == 3:
             print('3')
 
-    def update_orbit(self, array_time):
-        self.current_position, self.current_velocity = self.propagator_model.update_state(array_time)
+    def update_orbit(self, current_jd):
+        self.current_position, self.current_velocity = self.propagator_model.update_state(current_jd)
+
+    def update_attitte(self, q_i2b):
+        self.current_velocity_b = q_i2b.frame_conv(self.current_velocity)
+
+    def get_velocity_b(self):
+        return self.current_velocity_b
 
     def TransECItoGeo(self, current_sideral):
         r = np.sqrt(self.current_position[0] ** 2 + self.current_position[1] ** 2)

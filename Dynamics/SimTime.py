@@ -8,6 +8,8 @@ from datetime import datetime
 from Library.sgp4 import ext
 from Library.math_sup.tools_reference_frame import JdToDecyear
 
+inv_sec_day = 1 / (60.0 * 60.0 * 24.0)
+
 
 class SimTime(object):
 
@@ -20,12 +22,13 @@ class SimTime(object):
         self.current_array, _ = self.get_array_time()
         self.endsimTime     = time_properties['EndTime']
         self.simspeedTime   = time_properties['SimulationSpeed']
-        self.current_jd      = ext.jday(self.current_array[0],
-                                        self.current_array[1],
-                                        self.current_array[2],
-                                        self.current_array[3],
-                                        self.current_array[4],
-                                        self.current_array[5])
+        self.start_jd       = ext.jday(self.current_array[0],
+                                       self.current_array[1],
+                                       self.current_array[2],
+                                       self.current_array[3],
+                                       self.current_array[4],
+                                       self.current_array[5])
+        self.current_jd      = self.start_jd
         self.current_decyaer = JdToDecyear(self.current_jd)
         # Principal Time variable
         self.stepsimTime    = time_properties['StepTime']   # principal Step
@@ -53,25 +56,22 @@ class SimTime(object):
                              datetime_array.day,
                              datetime_array.hour,
                              datetime_array.minute,
-                             datetime_array.second + datetime_array.microsecond/1e6]
+                             datetime_array.second]
         return currenttime_array, datetime_array.strftime('%Y-%m-%d %H:%M:%S')
 
     def updateSimtime(self):
         self.currentsimTime     += self.stepsimTime
         self.maincountTime      += self.stepsimTime
         self.current_array, _    = self.get_array_time()
-        self.current_jd      = ext.jday(self.current_array[0],
-                                        self.current_array[1],
-                                        self.current_array[2],
-                                        self.current_array[3],
-                                        self.current_array[4],
-                                        self.current_array[5])
-        self.current_decyaer = JdToDecyear(self.current_jd)
+        self.current_jd          = self.start_jd + self.maincountTime * inv_sec_day
+        self.current_decyaer     = JdToDecyear(self.current_jd)
         self.orbitcountTime     += self.stepsimTime
 
-        if abs(self.orbitcountTime - self.orbitstep) < 1e-6:
+        if self.orbitcountTime >= self.orbitstep:
             self.orbit_update_flag = True
             self.orbitcountTime = 0
+        else:
+            self.orbit_update_flag = False
 
         self.update_log_count()
 
