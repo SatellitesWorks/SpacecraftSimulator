@@ -1,10 +1,18 @@
 
-class Atmosphere(object):
+import numpy as np
 
-    def __init__(self):
-        self.density = 0
+
+class Atmosphere(object):
+    def __init__(self, properties):
+        self.current_density = 0
+        self.envir_flag = properties['atm_calculation']
+
+    def update(self, dynamics, decyear):
+        alt = dynamics.orbit.current_alt
+        self.cal_denUSSA76(alt * 0.001)
 
     def cal_denUSSA76(self, z):
+        z *= 0.001
         i = 0
         # Geometric altitudes (km):
         h = [0, 25, 30, 40, 50, 60, 70, 80, 90, 100,
@@ -38,7 +46,7 @@ class Atmosphere(object):
                     i = j
 
         # ...Exponential interpolation:
-        self.density = r[i] * np.exp(-(z - h[i]) / H[i])
+        self.current_density = r[i] * np.exp(-(z - h[i]) / H[i])
 
     def get_density(self):
-        return self.density
+        return self.current_density

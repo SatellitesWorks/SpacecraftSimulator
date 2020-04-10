@@ -1,31 +1,29 @@
 
 from .MagEnv import MagEnv
+from .Atmosphere import Atmosphere
+from .SolarRadiation import SolarRadiation
 
 
-class Environment(MagEnv):
+class Environment(object):
     def __init__(self, environment_properties):
-        MagEnv.__init__(self, environment_properties['MAG'])
-
-        self.env_mag_flag = environment_properties['MAG']['mag_calculation']
-        self.env_srp_flag = environment_properties['SRP']['srp_calculation']
-        self.env_atm_flag = environment_properties['ATM']['atm_calculation']
-
+        self.envir = []
         print('\nEnvironment properties')
         print('------------------------------')
-        print('Magnetic: ' + str(self.env_mag_flag))
-        print('Solar radiation: ' + str(self.env_srp_flag))
-        print('Atmosphere: ' + str(self.env_atm_flag))
+        if environment_properties['ATM']['atm_calculation']:
+            self.atm = Atmosphere(environment_properties['ATM'])
+            self.envir.append(self.atm)
+            print('Atmosphere: ' + str(self.atm.envir_flag))
+        if environment_properties['MAG']['mag_calculation']:
+            self.magnetic = MagEnv(environment_properties['MAG'])
+            self.envir.append(self.magnetic)
+            print('Magnetic: ' + str(self.magnetic.envir_flag))
+        if environment_properties['SRP']['srp_calculation']:
+            self.srp = SolarRadiation(environment_properties['SRP'])
+            self.envir.append(self.srp)
+            print('Solar radiation: ' + str(self.srp.envir_flag))
         print('------------------------------')
 
     def update(self, decyear, dynamics):
-        sideral  = dynamics.ephemeris.selected_center_object.current_sideral
-        lat = dynamics.orbit.current_lat
-        lon = dynamics.orbit.current_long
-        alt = dynamics.orbit.current_alt
-        q_i2b = dynamics.attitude.current_quaternion_i2b
-        if self.env_mag_flag:
-            self.calc_mag(decyear, sideral, lat, lon, alt, q_i2b)
-
-
-
-
+        for env in self.envir:
+            if env.envir_flag:
+                env.update(dynamics, decyear)

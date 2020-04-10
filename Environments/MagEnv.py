@@ -12,6 +12,15 @@ class MagEnv(object):
         self.Mag_i = np.zeros(3)
         self.Mag_b = np.zeros(3)
         self.calcmagflag = True
+        self.envir_flag = mag_properties['mag_calculation']
+
+    def update(self, dynamics, decyear):
+        sideral  = dynamics.ephemeris.selected_center_object.current_sideral
+        lat = dynamics.orbit.current_lat
+        lon = dynamics.orbit.current_long
+        alt = dynamics.orbit.current_alt
+        q_i2b = dynamics.attitude.current_quaternion_i2b
+        self.calc_mag(decyear, sideral, lat, lon, alt, q_i2b)
 
     def calc_mag(self, decyear, sideral, lat, lon, alt, q_i2b):
         if not self.calcmagflag:
