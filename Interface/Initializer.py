@@ -207,18 +207,33 @@ def EnvSim():
 def DistSim():
     config = configparser.ConfigParser()
     config.read("Data/ini/Disturbance.ini", encoding="utf8")
-    grav_properties = {'gra_calculation': config['GRAVITY_GRADIENT']['calculation'],
-                       'gra_logging': config['GRAVITY_GRADIENT']['logging']}
+    grav_properties = {'gra_calculation': config['GRAVITY_GRADIENT']['calculation'] == 'True',
+                       'gra_logging': config['GRAVITY_GRADIENT']['logging'] == 'True'}
     rmm_const_b = np.zeros(3)
-    rmm_const_b[0] = config['MAG_DISTURBANCE']['rmm_const_b(0)']
-    rmm_const_b[1] = config['MAG_DISTURBANCE']['rmm_const_b(1)']
-    rmm_const_b[2] = config['MAG_DISTURBANCE']['rmm_const_b(2)']
-    mag_properties = {'mag_calculation': config['MAG_DISTURBANCE']['calculation'],
-                      'mag_logging': config['MAG_DISTURBANCE']['logging'],
+    rmm_const_b[0] = float(config['MAG_DISTURBANCE']['rmm_const_b(0)'])
+    rmm_const_b[1] = float(config['MAG_DISTURBANCE']['rmm_const_b(1)'])
+    rmm_const_b[2] = float(config['MAG_DISTURBANCE']['rmm_const_b(2)'])
+    mag_properties = {'mag_calculation': config['MAG_DISTURBANCE']['calculation'] == 'True',
+                      'mag_logging': config['MAG_DISTURBANCE']['logging'] == 'True',
                       'mag_rmm_const_b': rmm_const_b,
                       'mag_rmm_rwdev': float(config['MAG_DISTURBANCE']['rmm_rwdev']),
                       'mag_rmm_rwlimit': float(config['MAG_DISTURBANCE']['rmm_rwlimit']),
                       'mag_rmm_wnvar': float(config['MAG_DISTURBANCE']['rmm_wnvar'])}
+
+    specularity = np.zeros(6)
+    specularity[0] = config['AIRDRAG']['specularity(0)']
+    specularity[1] = config['AIRDRAG']['specularity(1)']
+    specularity[2] = config['AIRDRAG']['specularity(2)']
+    specularity[3] = config['AIRDRAG']['specularity(3)']
+    specularity[4] = config['AIRDRAG']['specularity(4)']
+    specularity[5] = config['AIRDRAG']['specularity(5)']
+
+    atmdrag_properties = {'atm_calculation': config['AIRDRAG']['calculation'] == 'True',
+                          'atm_logging': config['AIRDRAG']['logging'] == 'True',
+                          'Temp_wall': float(config['AIRDRAG']['Temp_wall']),
+                          'specularity': specularity,
+                          'Molecular': float(config['AIRDRAG']['Molecular']),
+                          'Temp_molecular': float(config['AIRDRAG']['Temp_molecular'])}
 
     position_vector_surface = np.zeros((6, 3))
     position_vector_surface[0] = [config['SURFACEFORCE']['px_arm(0)'],
@@ -267,9 +282,9 @@ def DistSim():
                      config['SURFACEFORCE']['mz_normal(1)'],
                      config['SURFACEFORCE']['mz_normal(2)']]
 
-    sff_center = np.array([config['SURFACEFORCE']['center(0)'],
-                           config['SURFACEFORCE']['center(1)'],
-                           config['SURFACEFORCE']['center(2)']])
+    sff_center = np.array([float(config['SURFACEFORCE']['center(0)']),
+                           float(config['SURFACEFORCE']['center(1)']),
+                           float(config['SURFACEFORCE']['center(2)'])])
 
     sff_properties = {'sff_position': position_vector_surface,
                       'sff_area': sff_area,
@@ -277,6 +292,7 @@ def DistSim():
                       'sff_center': sff_center}
 
     disturbance_properties = {'GRA': grav_properties,
+                              'ATM': atmdrag_properties,
                               'MAG': mag_properties,
                               'SFF': sff_properties}
     return disturbance_properties
