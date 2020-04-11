@@ -39,6 +39,9 @@ class TwoBodyProblem(object):
     def set_acc_i(self, acc_i):
         self.acc_i += acc_i
 
+    def add_force_i(self, force_i, mass):
+        self.acc_i += force_i / mass
+
     def rungeonestep(self):
         t = self.current_time
         dt = self.step_width

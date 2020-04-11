@@ -34,6 +34,7 @@ class MainOrbit(object):
         self.historical_lats        = []
         self.historical_longs       = []
         self.historical_alts        = []
+        self.acc_i                  = np.array([0, 0, 0])
 
     def set_propagator(self):
         if self.propagation_properties['propagate_mode'] == 0:
@@ -44,7 +45,6 @@ class MainOrbit(object):
         elif self.propagation_properties['propagate_mode'] == 1:
             line1      = self.orbit_properties[0]
             line2      = self.orbit_properties[1]
-
             self.propagator_model = EarthCenterOrbit(line1, line2, self.wgs)
         elif self.propagation_properties['propagate_mode'] == 2:
             print('2')
@@ -56,6 +56,14 @@ class MainOrbit(object):
 
     def update_attitte(self, q_i2b):
         self.current_velocity_b = q_i2b.frame_conv(self.current_velocity)
+
+    def add_ext_force_b(self, force_b, q_i2b, mass):
+        force_i = q_i2b.frame_conv(force_b)
+        self.propagator_model.add_force_i(force_i, mass)
+
+    def add_int_force_b(self, force_b, q_i2b, mass):
+        force_i = q_i2b.frame_conv(force_b)
+        self.propagator_model.add_force_i(force_i, mass)
 
     def get_velocity_b(self):
         return self.current_velocity_b

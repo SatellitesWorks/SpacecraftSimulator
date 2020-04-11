@@ -37,6 +37,7 @@ class Disturbances(object):
             if dist.dist_flag:
                 dist.update(self.dist_environment, self.dist_spacecraft)
                 self.dist_torque_b += dist.get_torque_b()
+                self.dist_force_b += dist.get_force_b()
 
     def get_dist_torque(self):
         return self.dist_torque_b

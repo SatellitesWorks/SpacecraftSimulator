@@ -22,6 +22,7 @@ class Attitude(object):
         self.current_omega_b        = np.array(attitude_spacecraft['Omega_b'])
 
         self.Inertia                = attitude_spacecraft['Inertia']
+        self.mass                   = attitude_spacecraft['Mass']
         self.inv_Inertia            = np.linalg.inv(self.Inertia)
 
         self.current_h_rw_b     = np.zeros(3)

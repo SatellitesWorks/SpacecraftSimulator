@@ -33,6 +33,7 @@ class EarthCenterOrbit(object):
         self.line2 = line2
         self.position_i = np.zeros(3)
         self.velocity_i = np.zeros(3)
+        self.acc_i = np.zeros(3)
 
         if wgs == 0:
             self.wgs = wgs72old
@@ -56,3 +57,6 @@ class EarthCenterOrbit(object):
         self.position_i = np.array(position_i) * 1000
         self.velocity_i = np.array(velocity_i) * 1000
         return self.position_i, self.velocity_i  # [m]
+
+    def add_force_i(self, force_i, mass):
+        self.acc_i *= 0

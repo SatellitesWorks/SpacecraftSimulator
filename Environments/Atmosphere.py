@@ -12,7 +12,6 @@ class Atmosphere(object):
         self.cal_denUSSA76(alt * 0.001)
 
     def cal_denUSSA76(self, z):
-        z *= 0.001
         i = 0
         # Geometric altitudes (km):
         h = [0, 25, 30, 40, 50, 60, 70, 80, 90, 100,

@@ -37,12 +37,14 @@ class SurfaceForce(object):
         unit_vector_to_plane = vector_to_plane * norm_vector_to_plane
         unit_tang_vector = np.cross(unit_vector_to_plane, self.normal_vector_face[self.condition_, :])
         unit_normal_vector = - self.normal_vector_face[self.condition_, :]
-        normal_vector_b = unit_normal_vector * self.surface_area[self.condition_] * Cp.reshape((Cp.size, 1))
-        tang_vector_b = unit_tang_vector * self.surface_area[self.condition_] * Ct.reshape((Ct.size, 1))
-        forces_vectors = norm_vector_to_plane + tang_vector_b
+        normal_vector_b = unit_normal_vector * self.surface_area[self.condition_].reshape(Cp.size,
+                                                                                          1) * Cp.reshape((Cp.size, 1))
+        tang_vector_b = unit_tang_vector * self.surface_area[self.condition_].reshape(Cp.size,
+                                                                                      1)  * Ct.reshape((Ct.size, 1))
+        forces_vectors = (normal_vector_b + tang_vector_b)
         unit_torque_b = np.cross(self.position_vector_face[self.condition_] - self.mass_center, forces_vectors)
-        self.force_vector_b = np.sum(forces_vectors, axis=1)
-        self.torque_vector_b = np.sum(unit_torque_b, axis=1)
+        self.force_vector_b = np.sum(forces_vectors, axis=0)
+        self.torque_vector_b = np.sum(unit_torque_b, axis=0)
 
     def calc_ang_parameters(self, input_b_norm):
         self.cos_theta = np.inner(self.normal_vector_face, input_b_norm)
